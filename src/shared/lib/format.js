@@ -21,8 +21,19 @@ const formatterFor = (moneda = 'COP', locale = getActiveLocale()) => {
   return currencyFormatters.get(key);
 };
 
-export const formatMoney = (value, moneda = 'COP', locale = getActiveLocale()) =>
-  value === null || value === undefined ? '-' : formatterFor(moneda, locale).format(Number(value));
+export const formatNumber = (value, locale = getActiveLocale()) =>
+  value === null || value === undefined || isNaN(value)
+    ? '-'
+    : new Intl.NumberFormat(locale).format(Number(value));
+
+export const formatMoney = (value, moneda = 'COP', locale = getActiveLocale()) => {
+  if (value === null || value === undefined || isNaN(value)) return '-';
+  try {
+    return formatterFor(moneda, locale).format(Number(value));
+  } catch {
+    return `$ ${formatNumber(value, locale)} ${moneda}`;
+  }
+};
 
 /** Version compacta para KPIs: $ 1.250 M */
 export const formatMoneyShort = (value, moneda = 'COP', locale = getActiveLocale()) => {
@@ -32,9 +43,6 @@ export const formatMoneyShort = (value, moneda = 'COP', locale = getActiveLocale
   if (Math.abs(n) >= 1_000_000) return `${symbol} ${(n / 1_000_000).toFixed(1)} M`;
   return formatMoney(n, moneda, locale);
 };
-
-export const formatNumber = (value, locale = getActiveLocale()) =>
-  new Intl.NumberFormat(locale).format(Number(value ?? 0));
 
 export const formatArea = (value, locale = getActiveLocale()) =>
   value ? `${formatNumber(value, locale)} m²` : '-';
@@ -47,9 +55,9 @@ export const formatDateTime = (value, locale = getActiveLocale()) =>
 
 export const formatPercent = (value) => `${Number(value ?? 0).toFixed(1)}%`;
 
-export const relativeDays = (value) => {
+export const relativeDays = (value, locale = getActiveLocale()) => {
   if (!value) return '-';
-  const isEn = getActiveLocale().startsWith('en');
+  const isEn = (locale || getActiveLocale()).startsWith('en');
   // Se acota a 0: un reloj de servidor adelantado no debe mostrar dias negativos
   const days = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 86_400_000));
   if (isEn) {

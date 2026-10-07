@@ -1,11 +1,7 @@
-import { useEffect } from 'react';
+import { useEscapeKey } from '@shared/hooks/useEscapeKey.js';
 
 export function Modal({ title, children, onClose, footer, wide = false }) {
-  useEffect(() => {
-    const onKey = (event) => { if (event.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  useEscapeKey(onClose);
 
   return (
     <div className="modal-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>

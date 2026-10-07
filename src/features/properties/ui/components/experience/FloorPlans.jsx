@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Reveal } from '@shared/ui/Reveal.jsx';
 import { useTranslation } from '@shared/i18n/index.js';
+import { resolveMediaUrl } from '@shared/api/httpClient.js';
 import { DummyFloorPlanSVG } from './DummyFloorPlanSVG.jsx';
 
 /**
@@ -37,10 +38,7 @@ export function FloorPlans({ propiedad }) {
   const planta = plantas[Math.min(activa, plantas.length - 1)];
   const fotos = (propiedad.imagenes ?? []).filter((img) => img.plantaId === planta.id);
 
-  const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-  const planoSrc = planta?.planoUrl
-    ? (planta.planoUrl.startsWith('/') ? `${apiBase}${planta.planoUrl}` : planta.planoUrl.replace(/^https?:\/\/localhost:\d+/, apiBase))
-    : null;
+  const planoSrc = resolveMediaUrl(planta?.planoUrl) || null;
 
   const handleTabChange = (index) => {
     setActiva(index);

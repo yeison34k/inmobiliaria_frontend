@@ -1,10 +1,24 @@
 import { ApiError } from './ApiError.js';
 import { tokenStorage } from './tokenStorage.js';
 
-const BASE_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '') || '';
+export const API_BASE_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '') || '';
+
+/**
+ * Resuelve una URL de archivo multimedia (imágenes, planos, feeds, etc.)
+ * Si la URL es relativa (/uploads/...), le antepone API_BASE_URL.
+ * Si es una URL local absoluta (http://localhost:3000/uploads/...), reemplaza el host por API_BASE_URL.
+ */
+export function resolveMediaUrl(url) {
+  if (!url) return '';
+  if (url.startsWith('/')) return `${API_BASE_URL}${url}`;
+  if (/^https?:\/\/localhost:\d+/i.test(url)) {
+    return url.replace(/^https?:\/\/localhost:\d+/i, API_BASE_URL);
+  }
+  return url;
+}
 
 const buildUrl = (path, query) => {
-  const url = `${BASE_URL}/api${path}`;
+  const url = `${API_BASE_URL}/api${path}`;
   if (!query) return url;
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {

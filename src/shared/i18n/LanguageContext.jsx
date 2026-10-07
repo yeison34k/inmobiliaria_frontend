@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { es } from './translations/es.js';
 import { en } from './translations/en.js';
+import { formatNumber, formatMoney, formatArea, formatDate, formatDateTime, relativeDays } from '../lib/format.js';
 
 const STORAGE_KEY = 'inmobiliaria_lang';
 const TRANSLATIONS = { es, en };
@@ -61,44 +62,12 @@ export function LanguageProvider({ children }) {
     const isEn = language === 'en';
     const locale = isEn ? 'en-US' : 'es-CO';
 
-    const formatNumber = (num) =>
-      num === null || num === undefined || isNaN(num)
-        ? '-'
-        : new Intl.NumberFormat(locale).format(Number(num));
-
-    const formatMoney = (val, moneda = 'COP') => {
-      if (val === null || val === undefined || isNaN(val)) return '-';
-      const num = Number(val);
-      try {
-        return new Intl.NumberFormat(locale, {
-          style: 'currency',
-          currency: moneda,
-          maximumFractionDigits: 0,
-        }).format(num);
-      } catch {
-        return `$ ${formatNumber(num)} ${moneda}`;
-      }
-    };
-
-    const formatArea = (val) => (val ? `${formatNumber(val)} m²` : '-');
-
-    const formatDate = (val) =>
-      val
-        ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(val))
-        : '-';
-
-    const relativeDays = (val) => {
-      if (!val) return '-';
-      const days = Math.max(0, Math.floor((Date.now() - new Date(val).getTime()) / 86_400_000));
-      if (isEn) {
-        if (days === 0) return 'today';
-        if (days === 1) return 'yesterday';
-        return `${days} days ago`;
-      }
-      if (days === 0) return 'hoy';
-      if (days === 1) return 'ayer';
-      return `hace ${days} días`;
-    };
+    const formatNum = (num) => formatNumber(num, locale);
+    const formatMon = (val, moneda = 'COP') => formatMoney(val, moneda, locale);
+    const formatAr = (val) => formatArea(val, locale);
+    const formatDt = (val) => formatDate(val, locale);
+    const formatDtTime = (val) => formatDateTime(val, locale);
+    const relDays = (val) => relativeDays(val, locale);
 
     const typeLabel = (tipo) =>
       t(`types.${tipo}`) || tipo;
@@ -115,11 +84,12 @@ export function LanguageProvider({ children }) {
       setLanguage,
       toggleLanguage: () => setLanguage(language === 'es' ? 'en' : 'es'),
       t,
-      formatNumber,
-      formatMoney,
-      formatArea,
-      formatDate,
-      relativeDays,
+      formatNumber: formatNum,
+      formatMoney: formatMon,
+      formatArea: formatAr,
+      formatDate: formatDt,
+      formatDateTime: formatDtTime,
+      relativeDays: relDays,
       typeLabel,
       operationLabel,
       statusLabel,

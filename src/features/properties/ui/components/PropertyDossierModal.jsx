@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { useTranslation } from '@shared/i18n/index.js';
+import { useEscapeKey } from '@shared/hooks/useEscapeKey.js';
 import { specFor } from '../../domain/detailSpecs.js';
 
 /**
@@ -9,14 +9,7 @@ import { specFor } from '../../domain/detailSpecs.js';
  */
 export function PropertyDossierModal({ propiedad, onClose }) {
   const { t, formatMoney, formatDate, typeLabel, operationLabel, isEn } = useTranslation();
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  useEscapeKey(onClose);
 
   if (!propiedad) return null;
 
