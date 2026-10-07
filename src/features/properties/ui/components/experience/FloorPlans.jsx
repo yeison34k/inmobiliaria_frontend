@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Reveal } from '@shared/ui/Reveal.jsx';
-import { formatArea } from '@shared/lib/format.js';
+import { useTranslation } from '@shared/i18n/index.js';
 import { DummyFloorPlanSVG } from './DummyFloorPlanSVG.jsx';
 
 /**
@@ -10,16 +10,21 @@ import { DummyFloorPlanSVG } from './DummyFloorPlanSVG.jsx';
  * arquitectónico vectorial esquemático (Dummy Floor Plan) en alta resolución.
  */
 export function FloorPlans({ propiedad }) {
+  const { formatArea, isEn } = useTranslation();
   const rawPlantas = propiedad.plantas ?? [];
 
   // Si la propiedad no tiene plantas explícitas, generamos una distribución esquemática por defecto
   const plantas = rawPlantas.length > 0 ? rawPlantas : [
     {
       id: 'planta-general',
-      nombre: propiedad.tipo === 'lote' ? 'Zonificación de Linderos' : 'Planta de Distribución Integral',
+      nombre: propiedad.tipo === 'lote' ? (isEn ? 'Zoning & Boundaries' : 'Zonificación de Linderos') : (isEn ? 'Overall Layout Plan' : 'Planta de Distribución Integral'),
       descripcion: propiedad.tipo === 'lote'
-        ? `Levantamiento técnico de linderos, topografía y proyección de huella edificable (${propiedad.detalles?.frenteM || 30}m de frente × ${propiedad.detalles?.fondoM || 50}m de fondo).`
-        : `Distribución espacial con zonificación integrada de áreas sociales, descanso y servicios (${propiedad.area || 120} m²).`,
+        ? (isEn
+            ? `Technical boundary survey and buildable footprint (${propiedad.detalles?.frenteM || 30}m frontage × ${propiedad.detalles?.fondoM || 50}m depth).`
+            : `Levantamiento técnico de linderos, topografía y proyección de huella edificable (${propiedad.detalles?.frenteM || 30}m de frente × ${propiedad.detalles?.fondoM || 50}m de fondo).`)
+        : (isEn
+            ? `Spatial distribution with integrated zoning of social, private, and service areas (${propiedad.area || 120} m²).`
+            : `Distribución espacial con zonificación integrada de áreas sociales, descanso y servicios (${propiedad.area || 120} m²).`),
       areaM2: propiedad.area || (propiedad.tipo === 'lote' ? propiedad.detalles?.areaM2 : 120),
       planoUrl: null,
     },
@@ -32,6 +37,11 @@ export function FloorPlans({ propiedad }) {
   const planta = plantas[Math.min(activa, plantas.length - 1)];
   const fotos = (propiedad.imagenes ?? []).filter((img) => img.plantaId === planta.id);
 
+  const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+  const planoSrc = planta?.planoUrl
+    ? (planta.planoUrl.startsWith('/') ? `${apiBase}${planta.planoUrl}` : planta.planoUrl.replace(/^https?:\/\/localhost:\d+/, apiBase))
+    : null;
+
   const handleTabChange = (index) => {
     setActiva(index);
     setImgError(false);
@@ -40,9 +50,11 @@ export function FloorPlans({ propiedad }) {
   return (
     <section className="exp-section exp-plantas" id="seccion-plantas">
       <Reveal>
-        <p className="exp-kicker">Distribución Arquitectónica</p>
+        <p className="exp-kicker">{isEn ? 'Architectural Layout' : 'Distribución Arquitectónica'}</p>
         <h2 className="exp-title">
-          {propiedad.tipo === 'lote' ? 'Plano de linderos y zonificación' : 'Recorra la propiedad por niveles'}
+          {propiedad.tipo === 'lote'
+            ? (isEn ? 'Zoning and Boundary Survey' : 'Plano de linderos y zonificación')
+            : (isEn ? 'Explore the property floor by floor' : 'Recorra la propiedad por niveles')}
         </h2>
       </Reveal>
 
@@ -69,9 +81,9 @@ export function FloorPlans({ propiedad }) {
           onClick={() => setZoomPlano(!zoomPlano)}
           title="Haga clic para ampliar el plano"
         >
-          {planta.planoUrl && !imgError ? (
+          {planoSrc && !imgError ? (
             <img
-              src={planta.planoUrl}
+              src={planoSrc}
               alt={`Plano de ${planta.nombre}`}
               loading="lazy"
               onError={() => setImgError(true)}
@@ -101,7 +113,7 @@ export function FloorPlans({ propiedad }) {
               letterSpacing: '0.04em',
             }}
           >
-            ✦ {zoomPlano ? 'Clic para reducir' : 'Clic para ampliar plano'}
+            ✦ {zoomPlano ? (isEn ? 'Click to reduce' : 'Clic para reducir') : (isEn ? 'Click to enlarge plan' : 'Clic para ampliar plano')}
           </div>
         </div>
 
@@ -124,11 +136,11 @@ export function FloorPlans({ propiedad }) {
               color: 'var(--exp-ink-soft, #64748b)',
             }}
           >
-            <span>📏 Acotaciones en metros</span>
+            <span>📏 {isEn ? 'Dimensions in meters' : 'Acotaciones en metros'}</span>
             <span>·</span>
-            <span>🧭 Orientación al Norte</span>
+            <span>🧭 {isEn ? 'North orientation' : 'Orientación al Norte'}</span>
             <span>·</span>
-            <span>📐 Escala 1:100</span>
+            <span>📐 {isEn ? 'Scale 1:100' : 'Escala 1:100'}</span>
           </div>
 
           {fotos.length ? (

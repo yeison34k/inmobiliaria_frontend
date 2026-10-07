@@ -1,4 +1,5 @@
 import { Reveal } from '@shared/ui/Reveal.jsx';
+import { useTranslation } from '@shared/i18n/index.js';
 
 /**
  * Bloque 2: el manifiesto.
@@ -6,6 +7,7 @@ import { Reveal } from '@shared/ui/Reveal.jsx';
  * Si la propiedad aun no tiene manifiesto, cae a la descripcion tecnica.
  */
 export function ExperienceManifesto({ propiedad }) {
+  const { isEn } = useTranslation();
   const texto = propiedad.historia?.manifiesto ?? propiedad.descripcion;
   if (!texto) return null;
 
@@ -14,7 +16,7 @@ export function ExperienceManifesto({ propiedad }) {
   return (
     <section className="exp-section exp-manifesto">
       <Reveal className="exp-manifesto__aside" as="aside">
-        <p className="exp-kicker">La historia</p>
+        <p className="exp-kicker">{isEn ? 'The Story' : 'La historia'}</p>
       </Reveal>
 
       <div className="exp-manifesto__body">

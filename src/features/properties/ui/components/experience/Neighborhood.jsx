@@ -1,4 +1,5 @@
 import { Reveal } from '@shared/ui/Reveal.jsx';
+import { useTranslation } from '@shared/i18n/index.js';
 import { SURROUNDING_META } from '../../../domain/concepts.js';
 
 /**
@@ -6,6 +7,7 @@ import { SURROUNDING_META } from '../../../domain/concepts.js';
  * Quien compra premium no compra solo la casa: compra el barrio.
  */
 export function Neighborhood({ propiedad }) {
+  const { isEn } = useTranslation();
   const puntos = propiedad.entorno ?? [];
   if (!puntos.length) return null;
 
@@ -17,7 +19,7 @@ export function Neighborhood({ propiedad }) {
   return (
     <section className="exp-section exp-barrio">
       <Reveal>
-        <p className="exp-kicker">El entorno</p>
+        <p className="exp-kicker">{isEn ? 'Neighborhood & Lifestyle' : 'El entorno'}</p>
         <h2 className="exp-title">
           {[propiedad.ubicacion?.barrio, propiedad.ubicacion?.ciudad].filter(Boolean).join(', ')}
         </h2>

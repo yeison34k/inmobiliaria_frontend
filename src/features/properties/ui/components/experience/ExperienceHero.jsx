@@ -1,4 +1,5 @@
 import { useParallax } from '@shared/hooks/useReveal.js';
+import { useTranslation } from '@shared/i18n/index.js';
 
 const esArchivoDeVideo = (url) => /\.(mp4|webm|mov)(\?|$)/i.test(url ?? '');
 
@@ -19,10 +20,14 @@ const aEmbed = (url) => {
  * de estilo de vida y una unica accion.
  */
 export function ExperienceHero({ propiedad, onCta }) {
+  const { isEn } = useTranslation();
   const [ref, offset] = useParallax(0.1);
   const historia = propiedad.historia ?? {};
   const portada = propiedad.imagenPrincipal;
   const embed = aEmbed(historia.videoUrl);
+
+  const ctaDefault = isEn ? 'Schedule a private tour' : 'Agendar un recorrido privado';
+  const cta3d = isEn ? 'Explore 3D Tour' : 'Ver Recorrido 3D';
 
   return (
     <header className="exp-hero" ref={ref}>
@@ -30,11 +35,11 @@ export function ExperienceHero({ propiedad, onCta }) {
         {esArchivoDeVideo(historia.videoUrl) ? (
           <video src={historia.videoUrl} autoPlay muted loop playsInline poster={portada ?? undefined} />
         ) : embed ? (
-          <iframe src={embed} title={`Video de ${propiedad.nombrePublico}`} allow="autoplay; fullscreen" frameBorder="0" />
+          <iframe src={embed} title={`Video de ${propiedad.nombrePublico || propiedad.titulo}`} allow="autoplay; fullscreen" frameBorder="0" />
         ) : portada ? (
           <img
             src={portada}
-            alt={propiedad.nombrePublico}
+            alt={propiedad.nombrePublico || propiedad.titulo}
             style={{ transform: `translate3d(0, ${offset}px, 0) scale(1.18)` }}
           />
         ) : (
@@ -54,11 +59,11 @@ export function ExperienceHero({ propiedad, onCta }) {
 
         <div className="exp-hero__actions">
           <button type="button" className="exp-cta" onClick={onCta}>
-            {historia.ctaTexto ?? 'Agendar un recorrido privado'}
+            {historia.ctaTexto ?? ctaDefault}
           </button>
           {historia.tourUrl && (
             <a href="#tour-3d" className="exp-cta exp-cta--tour">
-              <span className="exp-cta__icon">🥽</span> Ver Recorrido 3D
+              <span className="exp-cta__icon">🥽</span> {cta3d}
             </a>
           )}
         </div>

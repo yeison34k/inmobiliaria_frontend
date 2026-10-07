@@ -1,5 +1,5 @@
 import { Reveal } from '@shared/ui/Reveal.jsx';
-import { formatMoney } from '@shared/lib/format.js';
+import { useTranslation } from '@shared/i18n/index.js';
 import { specFor } from '../../../domain/detailSpecs.js';
 import { OPERATION_LABELS, TYPE_LABELS } from '../../../domain/property.js';
 
@@ -12,9 +12,9 @@ const ICONOS = {
   serviciosDisponibles: '⚟', salasReuniones: '▣', recepcion: '◎',
 };
 
-const valorLegible = (campo, valor, moneda) => {
+const valorLegible = (campo, valor, moneda, formatMoney, isEn) => {
   if (valor === null || valor === undefined || valor === '') return null;
-  if (campo.type === 'boolean') return valor ? 'Si' : 'No';
+  if (campo.type === 'boolean') return valor ? (isEn ? 'Yes' : 'Sí') : 'No';
   if (campo.type === 'tags') {
     const lista = Array.isArray(valor) ? valor : [valor];
     return lista.length ? lista.join(' · ') : null;
@@ -29,26 +29,27 @@ const valorLegible = (campo, valor, moneda) => {
  * y se muestra como una retícula de datos, no como una tabla.
  */
 export function TechnicalSpecs({ propiedad }) {
+  const { formatMoney, typeLabel, operationLabel, isEn } = useTranslation();
   const campos = specFor(propiedad.tipo)
-    .map((campo) => ({ campo, valor: valorLegible(campo, propiedad.detalles?.[campo.name], propiedad.moneda) }))
+    .map((campo) => ({ campo, valor: valorLegible(campo, propiedad.detalles?.[campo.name], propiedad.moneda, formatMoney, isEn) }))
     .filter((fila) => fila.valor !== null);
 
   return (
     <section className="exp-section exp-datos">
       <Reveal>
-        <p className="exp-kicker">Ficha tecnica</p>
+        <p className="exp-kicker">{isEn ? 'Specifications' : 'Ficha técnica'}</p>
       </Reveal>
 
       <Reveal delay={80} className="exp-datos__precio">
         <div>
-          <p className="exp-datos__etiqueta">{OPERATION_LABELS[propiedad.operacion]}</p>
+          <p className="exp-datos__etiqueta">{operationLabel(propiedad.operacion)}</p>
           <p className="exp-datos__valor">
             {formatMoney(propiedad.precio, propiedad.moneda)}
-            {propiedad.operacion === 'arriendo' ? <span> /mes</span> : null}
+            {propiedad.operacion === 'arriendo' ? <span> {isEn ? '/mo' : '/mes'}</span> : null}
           </p>
         </div>
         <div className="exp-datos__meta">
-          <span>{TYPE_LABELS[propiedad.tipo]}</span>
+          <span>{typeLabel(propiedad.tipo)}</span>
           <span>{propiedad.codigo}</span>
         </div>
       </Reveal>
