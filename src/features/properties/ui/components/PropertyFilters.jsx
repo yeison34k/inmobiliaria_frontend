@@ -77,7 +77,9 @@ export function PropertyFilters({ valores, onChange, total }) {
           onChange={(e) => set({ ciudad: e.target.value || undefined })}
         >
           <option value="">{t('catalog.filters.allCities')}</option>
-          {ciudades.map((c) => <option key={c.ciudad} value={c.ciudad}>{c.ciudad}</option>)}
+          {ciudades.map((c) => (
+            <option key={`${c.ciudad}-${c.departamento}`} value={c.ciudad}>{c.ciudad}</option>
+          ))}
         </select>
 
         <select

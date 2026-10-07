@@ -188,7 +188,7 @@ export function HomePage() {
             </button>
             {ciudades.slice(0, 6).map((c) => (
               <button
-                key={c.ciudad}
+                key={`${c.ciudad}-${c.departamento}`}
                 type="button"
                 className={`home-map-city-btn ${ciudadFiltro === c.ciudad ? 'is-active' : ''}`}
                 onClick={() => setCiudadFiltro(ciudadFiltro === c.ciudad ? null : c.ciudad)}

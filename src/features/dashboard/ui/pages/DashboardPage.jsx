@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { StatCard } from '@shared/ui/StatCard.jsx';
 import { Spinner } from '@shared/ui/Spinner.jsx';
 import { ErrorState } from '@shared/ui/ErrorState.jsx';
-import { formatMoneyShort, formatNumber, formatPercent, relativeDays } from '@shared/lib/format.js';
+import { formatMoney, formatMoneyShort, formatNumber, formatPercent, relativeDays } from '@shared/lib/format.js';
 import { STATUS_META } from '@features/properties';
 import { useDashboardAlerts, useDashboardMetrics } from '../../application/useDashboardQueries.js';
 
@@ -224,7 +224,23 @@ export function DashboardPage() {
           render={(item) => (
             <>
               <Link to="/admin/agenda">{item.propiedad}</Link>
-              <small>{item.codigo} · {item.cliente} · {relativeDays(item.fechaInicio)}</small>
+              <small>
+                {item.codigo} · {item.cliente} · {relativeDays(item.fechaInicio)}
+                {item.estado === 'programada' ? ' · nunca se confirmo' : ''}
+              </small>
+            </>
+          )}
+        />
+        <AlertList
+          titulo="Comisiones sin repartir"
+          items={alertas?.comisionesSinRepartir}
+          render={(item) => (
+            <>
+              <Link to="/admin/operaciones">{item.propiedad}</Link>
+              <small>
+                {item.codigo} · {formatMoney(item.valor)} sin asignar
+                {item.agente ? ` · cerro ${item.agente}` : ''}
+              </small>
             </>
           )}
         />
