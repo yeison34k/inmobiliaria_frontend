@@ -1,0 +1,496 @@
+/* =========================================================================
+   MORTGAGE CALCULATOR / SIMULADOR FINANCIERO DE CRÉDITO HIPOTECARIO
+   Diseño de vanguardia editorial y FinTech, perfectamente integrado tanto
+   con los tokens conceptuales (--exp-*) de la experiencia como con el tema global.
+   ========================================================================= */
+
+.mortgage-calc {
+  --mc-bg: var(--exp-bg-alt, var(--surface-soft, #f8fafc));
+  --mc-card: var(--exp-bg, var(--surface, #ffffff));
+  --mc-ink: var(--exp-ink, var(--text, #0f172a));
+  --mc-ink-soft: var(--exp-ink-soft, var(--text-soft, #64748b));
+  --mc-line: var(--exp-line, var(--border, rgba(148, 163, 184, 0.25)));
+  --mc-accent: var(--exp-accent, var(--primary, #0f766e));
+  --mc-on-accent: var(--exp-on-accent, #ffffff);
+  --mc-radius: var(--exp-radius, 12px);
+  --mc-font-display: var(--exp-display, var(--font-display, inherit));
+
+  width: 100%;
+  margin: 0 auto;
+  color: var(--mc-ink);
+  font-family: inherit;
+}
+
+/* Header editorial */
+.mortgage-calc__header {
+  margin-bottom: 2.5rem;
+}
+
+.mortgage-calc__kicker {
+  font-family: var(--font-display, sans-serif);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: var(--exp-kicker-tracking, 0.2em);
+  text-transform: uppercase;
+  color: var(--mc-accent);
+  margin: 0 0 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mortgage-calc__kicker::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  background: currentColor;
+}
+
+.mortgage-calc__title {
+  font-family: var(--mc-font-display);
+  font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+  font-weight: var(--exp-display-weight, 700);
+  letter-spacing: var(--exp-display-tracking, -0.02em);
+  line-height: var(--exp-display-leading, 1.15);
+  margin: 0 0 0.75rem;
+  color: var(--mc-ink);
+}
+
+.mortgage-calc__subtitle {
+  font-size: clamp(0.95rem, 1.5vw, 1.0625rem);
+  color: var(--mc-ink-soft);
+  max-width: 65ch;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Layout principal de 2 columnas */
+.mortgage-calc__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+  align-items: stretch;
+}
+
+/* Columna izquierda: Controles y Parámetros */
+.mortgage-calc__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mortgage-card {
+  background: var(--mc-card);
+  border: 1px solid var(--mc-line);
+  border-radius: var(--mc-radius);
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px -8px rgba(0, 0, 0, 0.08);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.mortgage-card:focus-within {
+  border-color: var(--mc-accent);
+  box-shadow: 0 6px 24px -6px rgba(0, 0, 0, 0.12);
+}
+
+.mortgage-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.mortgage-card__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--mc-ink-soft);
+  margin: 0;
+}
+
+.mortgage-card__metric {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.mortgage-card__badge {
+  background: color-mix(in srgb, var(--mc-accent) 15%, transparent);
+  color: var(--mc-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+
+.mortgage-card__value {
+  font-family: var(--font-display, sans-serif);
+  font-size: 1.1875rem;
+  font-weight: 700;
+  color: var(--mc-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sliders estilizados */
+.mortgage-range-wrapper {
+  position: relative;
+  margin: 0.5rem 0 1.25rem;
+}
+
+.mortgage-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--mc-line);
+  outline: none;
+  margin: 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.mortgage-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--mc-accent);
+  border: 3px solid var(--mc-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mortgage-range::-webkit-slider-thumb:hover {
+  transform: scale(1.18);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+}
+
+.mortgage-range::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--mc-accent);
+  border: 3px solid var(--mc-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+
+/* Pastillas de selección rápida (Chips) */
+.mortgage-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.mortgage-chip {
+  background: transparent;
+  border: 1px solid var(--mc-line);
+  color: var(--mc-ink-soft);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.mortgage-chip:hover {
+  border-color: var(--mc-accent);
+  color: var(--mc-ink);
+  background: color-mix(in srgb, var(--mc-accent) 8%, transparent);
+}
+
+.mortgage-chip--active {
+  background: var(--mc-accent);
+  border-color: var(--mc-accent);
+  color: var(--mc-on-accent);
+  font-weight: 600;
+}
+
+.mortgage-chip--active:hover {
+  background: var(--mc-accent);
+  color: var(--mc-on-accent);
+  filter: brightness(1.1);
+}
+
+/* Input numérico de tasa */
+.mortgage-rate-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.mortgage-rate-input-wrap {
+  position: relative;
+  flex: 1;
+  max-width: 170px;
+}
+
+.mortgage-rate-input {
+  width: 100%;
+  background: var(--mc-bg);
+  border: 1px solid var(--mc-line);
+  border-radius: calc(var(--mc-radius) * 0.75);
+  padding: 0.55rem 2.2rem 0.55rem 0.85rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--mc-ink);
+  outline: none;
+  font-variant-numeric: tabular-nums;
+  transition: border-color 0.2s ease;
+}
+
+.mortgage-rate-input:focus {
+  border-color: var(--mc-accent);
+}
+
+.mortgage-rate-suffix {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--mc-ink-soft);
+  pointer-events: none;
+}
+
+.mortgage-rate-hint {
+  font-size: 0.75rem;
+  color: var(--mc-ink-soft);
+  line-height: 1.4;
+}
+
+/* Columna derecha: Resumen Ejecutivo Financiero */
+.mortgage-summary {
+  background: var(--mc-card);
+  border: 1px solid var(--mc-line);
+  border-radius: var(--mc-radius);
+  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.mortgage-summary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--mc-accent);
+}
+
+/* Hero metric: Cuota mensual */
+.mortgage-hero-metric {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--mc-line);
+}
+
+.mortgage-hero-metric__kicker {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mc-accent);
+  margin: 0 0 0.4rem;
+}
+
+.mortgage-hero-metric__amount {
+  font-family: var(--mc-font-display);
+  font-size: clamp(2.25rem, 4.2vw, 3.25rem);
+  font-weight: var(--exp-display-weight, 700);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--mc-ink);
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.mortgage-hero-metric__unit {
+  font-family: var(--font-display, sans-serif);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--mc-ink-soft);
+  letter-spacing: 0;
+}
+
+.mortgage-hero-metric__note {
+  font-size: 0.75rem;
+  color: var(--mc-ink-soft);
+  margin: 0.4rem 0 0;
+}
+
+/* Barra de Amortización Visual (Capital vs Intereses) */
+.mortgage-amort-bar {
+  margin: 0.5rem 0 0;
+}
+
+.mortgage-amort-bar__legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--mc-ink-soft);
+  margin-bottom: 0.4rem;
+}
+
+.mortgage-amort-bar__legend strong {
+  color: var(--mc-ink);
+}
+
+.mortgage-amort-bar__track {
+  height: 8px;
+  background: color-mix(in srgb, var(--mc-accent) 20%, transparent);
+  border-radius: 999px;
+  display: flex;
+  overflow: hidden;
+}
+
+.mortgage-amort-bar__fill-capital {
+  background: var(--mc-accent);
+  height: 100%;
+  transition: width 0.35s ease;
+}
+
+.mortgage-amort-bar__fill-interest {
+  background: color-mix(in srgb, var(--mc-accent) 35%, #94a3b8);
+  height: 100%;
+  transition: width 0.35s ease;
+}
+
+/* Desglose de Cifras Clave (Grid) */
+.mortgage-breakdown {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--mc-line);
+}
+
+.mortgage-breakdown__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+.mortgage-breakdown__label {
+  color: var(--mc-ink-soft);
+  margin: 0;
+}
+
+.mortgage-breakdown__value {
+  font-family: var(--font-display, sans-serif);
+  font-weight: 600;
+  color: var(--mc-ink);
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.mortgage-breakdown__row--highlight {
+  padding-top: 0.4rem;
+  font-size: 0.9375rem;
+}
+
+.mortgage-breakdown__row--highlight .mortgage-breakdown__label {
+  font-weight: 600;
+  color: var(--mc-ink);
+}
+
+.mortgage-breakdown__row--highlight .mortgage-breakdown__value {
+  color: var(--mc-accent);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* Botón CTA de Asesoría */
+.mortgage-cta-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 1rem 1.75rem;
+  background: var(--mc-accent);
+  color: var(--mc-on-accent);
+  border: none;
+  border-radius: var(--mc-radius);
+  font-family: var(--font-display, sans-serif);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.25s ease, filter 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--mc-accent) 35%, transparent);
+}
+
+.mortgage-cta-btn:hover {
+  filter: brightness(1.12);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--mc-accent) 45%, transparent);
+}
+
+.mortgage-cta-btn:active {
+  transform: translateY(0);
+}
+
+/* Micro-copy disclaimer */
+.mortgage-disclaimer {
+  font-size: 0.71875rem;
+  line-height: 1.5;
+  color: var(--mc-ink-soft);
+  opacity: 0.85;
+  margin: 0;
+}
+
+/* Adaptabilidad móvil y tablets */
+@media (max-width: 900px) {
+  .mortgage-calc__layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .mortgage-calc__header {
+    margin-bottom: 1.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mortgage-card {
+    padding: 1.15rem;
+  }
+  
+  .mortgage-summary {
+    padding: 1.25rem;
+  }
+
+  .mortgage-rate-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mortgage-rate-input-wrap {
+    max-width: 100%;
+    width: 100%;
+  }
+}
