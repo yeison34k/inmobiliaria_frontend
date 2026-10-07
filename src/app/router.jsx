@@ -6,6 +6,11 @@ import { AdminLayout } from './layouts/AdminLayout.jsx';
 import { HomePage } from './pages/HomePage.jsx';
 import { PageLoader } from '@shared/ui/PageLoader.jsx';
 
+// Funciones de prefetching anticipado al pasar el cursor (Hover/Focus Intent)
+export const prefetchCatalog = () => import('@features/properties/ui/pages/CatalogPage.jsx');
+export const prefetchContact = () => import('./pages/ContactPage.jsx');
+export const prefetchPropertyExperience = () => import('@features/properties/ui/pages/PropertyExperiencePage.jsx');
+
 // Carga diferida (Lazy Load) de páginas públicas secundarias
 const CatalogPage = lazy(() =>
   import('@features/properties/ui/pages/CatalogPage.jsx').then((m) => ({ default: m.CatalogPage }))

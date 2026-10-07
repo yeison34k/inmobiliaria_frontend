@@ -40,6 +40,9 @@ export function ExperienceHero({ propiedad, onCta }) {
           <img
             src={portada}
             alt={propiedad.nombrePublico || propiedad.titulo}
+            loading="eager"
+            fetchPriority="high"
+            decoding="sync"
             style={{ transform: `translate3d(0, ${offset}px, 0) scale(1.18)` }}
           />
         ) : (

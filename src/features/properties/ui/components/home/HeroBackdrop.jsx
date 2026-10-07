@@ -62,6 +62,8 @@ export function HeroBackdrop({ propiedades = [] }) {
             src={propiedad.imagenPrincipal}
             className={i === indice ? 'is-activa' : ''}
             loading={i === 0 ? 'eager' : 'lazy'}
+            fetchPriority={i === 0 ? 'high' : 'auto'}
+            decoding={i === 0 ? 'sync' : 'async'}
           />
         ))}
         <span className="portada__velo" />

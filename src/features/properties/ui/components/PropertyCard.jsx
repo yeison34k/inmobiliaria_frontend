@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { SmartImage } from '@shared/ui/SmartImage.jsx';
 import { useTranslation } from '@shared/i18n/index.js';
 import { detailsSummary } from '../../domain/detailSpecs.js';
 import { conceptOf } from '../../domain/concepts.js';
+import { catalogApi } from '../../infrastructure/propertyApi.js';
+import { propertyKeys } from '../../application/usePropertiesQueries.js';
+import { prefetchPropertyExperience } from '@app/router.jsx';
 import { PropertyStatusBadge } from './PropertyStatusBadge.jsx';
 
 /**
@@ -12,12 +16,24 @@ import { PropertyStatusBadge } from './PropertyStatusBadge.jsx';
  */
 export function PropertyCard({ propiedad, to, mostrarEstado = false, ancha = false }) {
   const { t, formatMoney, typeLabel, operationLabel, isEn } = useTranslation();
+  const queryClient = useQueryClient();
   const historia = propiedad.historia ?? {};
   const concepto = conceptOf(historia.concepto);
 
+  const handlePrefetch = () => {
+    prefetchPropertyExperience();
+    if (propiedad.slug) {
+      queryClient.prefetchQuery({
+        queryKey: propertyKeys.catalogDetail(propiedad.slug),
+        queryFn: () => catalogApi.detailBySlug(propiedad.slug),
+        staleTime: 120_000,
+      });
+    }
+  };
+
   return (
     <article className={ancha ? 'tarjeta tarjeta--ancha' : 'tarjeta'}>
-      <Link to={to}>
+      <Link to={to} onMouseEnter={handlePrefetch} onFocus={handlePrefetch}>
         <span className="tarjeta__foto">
           {propiedad.imagenPrincipal
             ? <SmartImage src={propiedad.imagenPrincipal} alt={propiedad.titulo} />

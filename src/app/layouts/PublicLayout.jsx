@@ -5,6 +5,7 @@ import { BackToTop } from '@shared/ui/BackToTop.jsx';
 import { PageLoader } from '@shared/ui/PageLoader.jsx';
 import { LanguageSwitcher } from '@shared/ui/LanguageSwitcher.jsx';
 import { useTranslation } from '@shared/i18n/index.js';
+import { prefetchCatalog, prefetchContact } from '../router.jsx';
 
 export function PublicLayout() {
   const { pathname, search } = useLocation();
@@ -29,10 +30,10 @@ export function PublicLayout() {
       <header className={compacto ? 'topbar is-compacta' : 'topbar'}>
         <Link to="/" className="brand">{t('nav.brand')}</Link>
         <nav className="topbar__nav">
-          <NavLink to="/propiedades?operacion=venta">{t('nav.buy')}</NavLink>
-          <NavLink to="/propiedades?operacion=arriendo">{t('nav.rent')}</NavLink>
-          <NavLink to="/propiedades" end>{t('nav.all')}</NavLink>
-          <NavLink to="/contacto">{t('nav.contact')}</NavLink>
+          <NavLink to="/propiedades?operacion=venta" onMouseEnter={prefetchCatalog} onFocus={prefetchCatalog}>{t('nav.buy')}</NavLink>
+          <NavLink to="/propiedades?operacion=arriendo" onMouseEnter={prefetchCatalog} onFocus={prefetchCatalog}>{t('nav.rent')}</NavLink>
+          <NavLink to="/propiedades" end onMouseEnter={prefetchCatalog} onFocus={prefetchCatalog}>{t('nav.all')}</NavLink>
+          <NavLink to="/contacto" onMouseEnter={prefetchContact} onFocus={prefetchContact}>{t('nav.contact')}</NavLink>
           <LanguageSwitcher />
           <Link to="/admin" className="btn btn--ghost btn--sm">{t('nav.admin')}</Link>
         </nav>
