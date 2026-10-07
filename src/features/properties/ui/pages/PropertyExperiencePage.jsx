@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Spinner } from '@shared/ui/Spinner.jsx';
 import { ErrorState } from '@shared/ui/ErrorState.jsx';
@@ -15,10 +15,16 @@ import { VirtualTour } from '../components/experience/VirtualTour.jsx';
 import { TechnicalSpecs } from '../components/experience/TechnicalSpecs.jsx';
 import { FloorPlans } from '../components/experience/FloorPlans.jsx';
 import { Neighborhood } from '../components/experience/Neighborhood.jsx';
-import { PropertyLocationMap } from '../components/experience/PropertyLocationMap.jsx';
-import { MortgageCalculator } from '../components/MortgageCalculator.jsx';
 import { ShareButtons } from '../components/ShareButtons.jsx';
 import { WhatsAppFloatingButton } from '../components/experience/WhatsAppFloatingButton.jsx';
+
+const PropertyLocationMap = lazy(() =>
+  import('../components/experience/PropertyLocationMap.jsx').then((m) => ({ default: m.PropertyLocationMap }))
+);
+
+const MortgageCalculator = lazy(() =>
+  import('../components/MortgageCalculator.jsx').then((m) => ({ default: m.MortgageCalculator }))
+);
 
 /**
  * Landing de la propiedad como experiencia cronologica:
@@ -141,16 +147,20 @@ export function PropertyExperiencePage() {
       <VirtualTour propiedad={propiedad} />
       <FloorPlans propiedad={propiedad} />
       <TechnicalSpecs propiedad={propiedad} />
-      <PropertyLocationMap propiedad={propiedad} />
+      <Suspense fallback={<div style={{ minHeight: '350px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Spinner label={isEn ? 'Loading map...' : 'Cargando mapa...'} /></div>}>
+        <PropertyLocationMap propiedad={propiedad} />
+      </Suspense>
       <Neighborhood propiedad={propiedad} />
 
       {propiedad.operacion === 'venta' ? (
         <section className="exp-section exp-calculadora">
-          <MortgageCalculator
-            precio={propiedad.precio}
-            moneda={propiedad.moneda}
-            onConsultarCredito={irAContacto}
-          />
+          <Suspense fallback={<div style={{ minHeight: '150px' }}><Spinner label={isEn ? 'Loading calculator...' : 'Cargando simulador...'} /></div>}>
+            <MortgageCalculator
+              precio={propiedad.precio}
+              moneda={propiedad.moneda}
+              onConsultarCredito={irAContacto}
+            />
+          </Suspense>
         </section>
       ) : null}
 

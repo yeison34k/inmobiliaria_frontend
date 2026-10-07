@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { ScrollProgress } from '@shared/ui/ScrollProgress.jsx';
 import { BackToTop } from '@shared/ui/BackToTop.jsx';
+import { PageLoader } from '@shared/ui/PageLoader.jsx';
 import { LanguageSwitcher } from '@shared/ui/LanguageSwitcher.jsx';
 import { useTranslation } from '@shared/i18n/index.js';
 
@@ -39,7 +40,9 @@ export function PublicLayout() {
 
       {/* La clave fuerza el remontaje: cada pagina entra con su propia transicion */}
       <main className="public__main pagina" key={pathname + search}>
-        <Outlet />
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <footer className="footer">

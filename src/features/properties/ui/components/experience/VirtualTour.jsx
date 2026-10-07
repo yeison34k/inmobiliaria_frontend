@@ -62,9 +62,26 @@ export function VirtualTour({ propiedad }) {
   const [estanciaActiva, setEstanciaActiva] = useState(null);
   const [mostrarGuia, setMostrarGuia] = useState(true);
   const [cargandoIframe, setCargandoIframe] = useState(true);
+  const [inView, setInView] = useState(false);
   const containerRef = useRef(null);
+  const wrapRef = useRef(null);
 
   const estancias = obtenerEstanciasSugeridas(propiedad.tipo, isEn);
+
+  useEffect(() => {
+    if (!wrapRef.current || inView) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+    observer.observe(wrapRef.current);
+    return () => observer.disconnect();
+  }, [inView]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -203,26 +220,40 @@ export function VirtualTour({ propiedad }) {
             </div>
           </div>
 
-          {/* Iframe con loader */}
-          <div className="exp-tour__iframe-wrap">
-            {cargandoIframe && (
-              <div className="exp-tour__loader">
+          {/* Iframe con loader diferido (Lazy load espacial) */}
+          <div ref={wrapRef} className="exp-tour__iframe-wrap">
+            {inView ? (
+              <>
+                {cargandoIframe && (
+                  <div className="exp-tour__loader">
+                    <div className="exp-tour__spinner" />
+                    <p>{isEn ? 'Loading 3D spatial tour...' : 'Cargando modelo espacial 3D...'}</p>
+                    <small>{isEn ? 'Connecting to immersive cloud' : 'Conectando con la nube inmersiva'}</small>
+                  </div>
+                )}
+
+                <iframe
+                  key={iframeKey}
+                  src={url}
+                  title={`Recorrido virtual 3D de ${propiedad.nombrePublico}`}
+                  allow="fullscreen; xr-spatial-tracking; accelerometer; gyroscope; magnetometer"
+                  allowFullScreen
+                  frameBorder="0"
+                  loading="lazy"
+                  onLoad={() => setCargandoIframe(false)}
+                />
+              </>
+            ) : (
+              <div
+                className="exp-tour__loader"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setInView(true)}
+              >
                 <div className="exp-tour__spinner" />
-                <p>{isEn ? 'Loading 3D spatial tour...' : 'Cargando modelo espacial 3D...'}</p>
-                <small>{isEn ? 'Connecting to immersive cloud' : 'Conectando con la nube inmersiva'}</small>
+                <p>{isEn ? '3D Tour Ready' : 'Recorrido 3D Listo'}</p>
+                <small>{isEn ? 'Scroll into view or click to start' : 'Desplácese hacia aquí o haga clic para iniciar'}</small>
               </div>
             )}
-
-            <iframe
-              key={iframeKey}
-              src={url}
-              title={`Recorrido virtual 3D de ${propiedad.nombrePublico}`}
-              allow="fullscreen; xr-spatial-tracking; accelerometer; gyroscope; magnetometer"
-              allowFullScreen
-              frameBorder="0"
-              loading="lazy"
-              onLoad={() => setCargandoIframe(false)}
-            />
           </div>
 
           {/* Guía flotante interactiva de navegación */}

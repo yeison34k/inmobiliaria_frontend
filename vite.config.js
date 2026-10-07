@@ -11,6 +11,22 @@ export default defineConfig({
       '@features': fileURLToPath(new URL('./src/features', import.meta.url)),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('leaflet')) return 'vendor-leaflet';
+            if (id.includes('@tanstack/react-query')) return 'vendor-query';
+            if (id.includes('react-router-dom') || id.includes('react-dom') || id.includes('react/')) {
+              return 'vendor-react';
+            }
+          }
+        },
+      },
+    },
+    chunkSizeWarningLimit: 600,
+  },
   server: {
     port: 5173,
     proxy: {

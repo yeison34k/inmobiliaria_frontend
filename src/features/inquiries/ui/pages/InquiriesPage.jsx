@@ -7,7 +7,7 @@ import { EmptyState } from '@shared/ui/EmptyState.jsx';
 import { Pagination } from '@shared/ui/Pagination.jsx';
 import { formatDateTime } from '@shared/lib/format.js';
 import { useToast } from '@shared/hooks/useToast.jsx';
-import { ScheduleVisitModal } from '@features/visits';
+import { ScheduleVisitModal } from '@features/visits/ui/components/ScheduleVisitModal.jsx';
 import { useInquiries, useInquiryMutations } from '../../application/useInquiriesQueries.js';
 import { INQUIRY_STATUS_META, InquiryStatus } from '../../domain/inquiry.js';
 

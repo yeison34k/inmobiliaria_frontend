@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { ROLE_LABELS, can, useAuth } from '@features/auth';
 import { NotificationBell } from '@features/notifications';
+import { PageLoader } from '@shared/ui/PageLoader.jsx';
 import { LanguageSwitcher } from '@shared/ui/LanguageSwitcher.jsx';
 import { CommandPalette } from '../components/CommandPalette.jsx';
 import { NotificationsPopover } from '../components/NotificationsPopover.jsx';
@@ -101,7 +102,9 @@ export function AdminLayout() {
       </aside>
 
       <main className="admin__main">
-        <Outlet />
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
       </main>
 
       {/* Paleta de comandos y busqueda global */}

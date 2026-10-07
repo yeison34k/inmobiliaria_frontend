@@ -1,11 +1,16 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Reveal } from '@shared/ui/Reveal.jsx';
+import { Spinner } from '@shared/ui/Spinner.jsx';
 import { useTranslation } from '@shared/i18n/index.js';
 import {
   CollectionGrid, FeaturedShowcase, HeroBackdrop, PropertyCard, PropertyCardSkeleton,
-  CatalogMap, TYPE_LABELS, useCatalogSearch, useCities,
+  TYPE_LABELS, useCatalogSearch, useCities,
 } from '@features/properties';
+
+const CatalogMap = lazy(() =>
+  import('@features/properties/ui/components/CatalogMap.jsx').then((m) => ({ default: m.CatalogMap }))
+);
 
 /**
  * Portada publica con mapa interactivo de ubicacion de inmuebles.
@@ -199,11 +204,29 @@ export function HomePage() {
           </div>
 
           <div className="home-map-wrapper">
-            <CatalogMap
-              propiedades={propiedadesParaMapa}
-              height="500px"
-              showFloatingCard={true}
-            />
+            <Suspense
+              fallback={
+                <div
+                  style={{
+                    height: '500px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'var(--bg-elevated)',
+                    borderRadius: 'var(--radius-lg)',
+                    border: '1px solid var(--border)',
+                  }}
+                >
+                  <Spinner label={t('home.map.title')} />
+                </div>
+              }
+            >
+              <CatalogMap
+                propiedades={propiedadesParaMapa}
+                height="500px"
+                showFloatingCard={true}
+              />
+            </Suspense>
           </div>
         </section>
 

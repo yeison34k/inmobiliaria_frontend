@@ -1,15 +1,19 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, lazy, Suspense } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ErrorState } from '@shared/ui/ErrorState.jsx';
 import { Pagination } from '@shared/ui/Pagination.jsx';
 import { Reveal } from '@shared/ui/Reveal.jsx';
+import { Spinner } from '@shared/ui/Spinner.jsx';
 import { useDebouncedValue } from '@shared/hooks/useDebouncedValue.js';
 import { useTranslation } from '@shared/i18n/index.js';
 import { useCatalogSearch } from '../../application/usePropertiesQueries.js';
 import { PropertyCard, PropertyCardSkeleton } from '../components/PropertyCard.jsx';
 import { PropertyFilters } from '../components/PropertyFilters.jsx';
-import { CatalogMap } from '../components/CatalogMap.jsx';
 import { conceptOf } from '../../domain/concepts.js';
+
+const CatalogMap = lazy(() =>
+  import('../components/CatalogMap.jsx').then((m) => ({ default: m.CatalogMap }))
+);
 
 const FILTER_KEYS = [
   'q', 'operacion', 'tipos', 'ciudad', 'concepto',
@@ -216,23 +220,27 @@ export function CatalogPage() {
             <Pagination meta={data.meta} onPageChange={(page) => aplicar({ ...filtros, page })} />
           </div>
           <div className="catalogo__split-mapa">
-            <CatalogMap
-              propiedades={items}
-              hoveredPropertyId={hoveredPropertyId}
-              height="100%"
-              showFloatingCard={false}
-            />
+            <Suspense fallback={<div style={{ height: '100%', minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-elevated)', borderRadius: 'var(--radius-lg)' }}><Spinner label={isEn ? 'Loading map...' : 'Cargando mapa...'} /></div>}>
+              <CatalogMap
+                propiedades={items}
+                hoveredPropertyId={hoveredPropertyId}
+                height="100%"
+                showFloatingCard={false}
+              />
+            </Suspense>
           </div>
         </div>
       ) : null}
 
       {items.length > 0 && vista === 'map' ? (
         <div className="catalogo__mapa-completo-wrapper">
-          <CatalogMap
-            propiedades={items}
-            height="620px"
-            showFloatingCard={true}
-          />
+          <Suspense fallback={<div style={{ height: '620px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-elevated)', borderRadius: 'var(--radius-lg)' }}><Spinner label={isEn ? 'Loading map...' : 'Cargando mapa...'} /></div>}>
+            <CatalogMap
+              propiedades={items}
+              height="620px"
+              showFloatingCard={true}
+            />
+          </Suspense>
         </div>
       ) : null}
     </section>

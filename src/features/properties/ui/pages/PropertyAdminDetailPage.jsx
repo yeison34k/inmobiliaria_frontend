@@ -9,9 +9,8 @@ import {
   CancelOperationModal, CloseOperationModal, DirectClosingModal,
   OperationStatusBadge, ReserveModal, useOperations,
 } from '@features/operations';
-import {
-  ScheduleVisitModal, VisitOutcomeBadge, VisitStatusBadge, useVisits,
-} from '@features/visits';
+import { ScheduleVisitModal } from '@features/visits/ui/components/ScheduleVisitModal.jsx';
+import { VisitOutcomeBadge, VisitStatusBadge, useVisits } from '@features/visits';
 import { DocumentsPanel } from '@features/documents';
 import {
   useProperty, usePropertyHistory, usePropertyMutations, usePropertyPriceHistory,
