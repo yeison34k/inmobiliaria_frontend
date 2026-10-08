@@ -62,26 +62,11 @@ export function VirtualTour({ propiedad }) {
   const [estanciaActiva, setEstanciaActiva] = useState(null);
   const [mostrarGuia, setMostrarGuia] = useState(true);
   const [cargandoIframe, setCargandoIframe] = useState(true);
-  const [inView, setInView] = useState(false);
+  const [tourActivado, setTourActivado] = useState(false);
   const containerRef = useRef(null);
   const wrapRef = useRef(null);
 
   const estancias = obtenerEstanciasSugeridas(propiedad.tipo, isEn);
-
-  useEffect(() => {
-    if (!wrapRef.current || inView) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) {
-          setInView(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: '300px' }
-    );
-    observer.observe(wrapRef.current);
-    return () => observer.disconnect();
-  }, [inView]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -94,6 +79,7 @@ export function VirtualTour({ propiedad }) {
   if (!url) return null;
 
   const toggleFullscreen = async () => {
+    if (!tourActivado) setTourActivado(true);
     try {
       if (!document.fullscreenElement) {
         if (containerRef.current?.requestFullscreen) {
@@ -110,12 +96,17 @@ export function VirtualTour({ propiedad }) {
   };
 
   const reiniciarRecorrido = () => {
+    if (!tourActivado) {
+      setTourActivado(true);
+      return;
+    }
     setCargandoIframe(true);
     setIframeKey((prev) => prev + 1);
   };
 
   const seleccionarEstancia = (estancia) => {
     setEstanciaActiva(estancia);
+    setTourActivado(true);
   };
 
   return (
@@ -220,9 +211,9 @@ export function VirtualTour({ propiedad }) {
             </div>
           </div>
 
-          {/* Iframe con loader diferido (Lazy load espacial) */}
+          {/* Iframe con fachada diferida (Click-to-Play de máximo rendimiento) */}
           <div ref={wrapRef} className="exp-tour__iframe-wrap">
-            {inView ? (
+            {tourActivado ? (
               <>
                 {cargandoIframe && (
                   <div className="exp-tour__loader">
@@ -245,13 +236,39 @@ export function VirtualTour({ propiedad }) {
               </>
             ) : (
               <div
-                className="exp-tour__loader"
-                style={{ cursor: 'pointer' }}
-                onClick={() => setInView(true)}
+                className="exp-tour__facade"
+                style={{
+                  backgroundImage: propiedad.imagenPrincipal
+                    ? `linear-gradient(rgba(6, 11, 22, 0.65), rgba(6, 11, 22, 0.88)), url(${propiedad.imagenPrincipal})`
+                    : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+                onClick={() => setTourActivado(true)}
               >
-                <div className="exp-tour__spinner" />
-                <p>{isEn ? '3D Tour Ready' : 'Recorrido 3D Listo'}</p>
-                <small>{isEn ? 'Scroll into view or click to start' : 'Desplácese hacia aquí o haga clic para iniciar'}</small>
+                <div className="exp-tour__facade-card">
+                  <div className="exp-tour__facade-vr-icon">🥽</div>
+                  <h3>{isEn ? 'Immersive 3D Spatial Twin' : 'Recorrido Virtual 3D Inmersivo'}</h3>
+                  <p>
+                    {isEn
+                      ? 'Walk freely across every space with 360° rotation and real-scale depth'
+                      : 'Explore cada espacio en 360° con giro libre a escala real'}
+                  </p>
+                  <button
+                    type="button"
+                    className="exp-tour__facade-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTourActivado(true);
+                    }}
+                  >
+                    <span>▶</span>
+                    <span>{isEn ? 'Start 3D Tour' : 'Activar Recorrido 3D'}</span>
+                  </button>
+                  <span className="exp-tour__facade-badge">
+                    ✦ {isEn ? 'Powered by Kuula 360°' : 'Tecnología Kuula 360° HD'}
+                  </span>
+                </div>
               </div>
             )}
           </div>

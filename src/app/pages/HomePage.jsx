@@ -42,7 +42,7 @@ export function HomePage() {
 
   const { data: destacadas } = useCatalogSearch({ destacada: 'true', orden: 'destacadas', pageSize: 6 });
   const { data: recientes, isLoading: cargando } = useCatalogSearch({ orden: 'recientes', pageSize: 8 });
-  const { data: mapaPropsData } = useCatalogSearch({ pageSize: 40 });
+  const { data: mapaPropsData } = useCatalogSearch({ pageSize: 40 }, { enabled: mapInView });
   const { data: ciudades = [] } = useCities();
 
   const inventario = recientes?.items ?? [];

@@ -12,9 +12,10 @@ export const propertyKeys = {
 
 // ------------------------------- lectura -------------------------------
 
-export const useCatalogSearch = (filtros) => useQuery({
+export const useCatalogSearch = (filtros, options = {}) => useQuery({
   queryKey: propertyKeys.catalog(filtros),
   queryFn: () => catalogApi.search(filtros),
+  ...options,
 });
 
 export const useCatalogProperty = (slug) => useQuery({

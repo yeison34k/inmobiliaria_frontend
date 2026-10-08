@@ -14,9 +14,9 @@ function getResponsiveImageProps(src, customSrcSet, customSizes) {
       const url = new URL(src);
       url.searchParams.set('auto', 'format');
       url.searchParams.set('fit', 'crop');
-      url.searchParams.set('q', '75');
+      url.searchParams.set('q', '70');
 
-      const widths = [400, 800, 1200, 1600];
+      const widths = [360, 600, 960, 1400];
       const srcSet = widths
         .map((w) => {
           const u = new URL(url.toString());
@@ -25,7 +25,7 @@ function getResponsiveImageProps(src, customSrcSet, customSizes) {
         })
         .join(', ');
 
-      url.searchParams.set('w', '800');
+      url.searchParams.set('w', '600');
       const optimizedSrc = url.toString();
       const sizes = customSizes || '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw';
 

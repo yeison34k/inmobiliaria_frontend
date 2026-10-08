@@ -57,23 +57,40 @@ export function useParallax(intensidad = 0.12, limite = 0.08) {
     const nodo = ref.current;
     if (!nodo) return undefined;
 
+    let isInView = false;
     let frame = null;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isInView = entry.isIntersecting;
+        if (isInView) calcular();
+      },
+      { rootMargin: '50px' }
+    );
+    observer.observe(nodo);
+
     const calcular = () => {
       frame = null;
+      if (!isInView) return;
       const rect = nodo.getBoundingClientRect();
       if (!rect.height) return;
       const centro = rect.top + rect.height / 2 - window.innerHeight / 2;
       const tope = rect.height * limite;
-      setOffset(Math.max(-tope, Math.min(tope, -centro * intensidad)));
-    };
-    const onScroll = () => {
-      if (frame === null) frame = requestAnimationFrame(calcular);
+      const nuevoOffset = Math.round(Math.max(-tope, Math.min(tope, -centro * intensidad)));
+      setOffset((prev) => (Math.abs(prev - nuevoOffset) >= 1 ? nuevoOffset : prev));
     };
 
-    calcular();
+    const onScroll = () => {
+      if (isInView && frame === null) {
+        frame = requestAnimationFrame(calcular);
+      }
+    };
+
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    window.addEventListener('resize', onScroll, { passive: true });
+
     return () => {
+      observer.disconnect();
       if (frame !== null) cancelAnimationFrame(frame);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
