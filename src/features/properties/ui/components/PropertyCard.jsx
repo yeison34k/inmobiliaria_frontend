@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { SmartImage } from '@shared/ui/SmartImage.jsx';
@@ -10,7 +11,7 @@ import { prefetchPropertyExperience } from '@app/router.jsx';
 import { PropertyStatusBadge } from './PropertyStatusBadge.jsx';
 
 /**
- * Tarjeta del catalogo.
+ * Tarjeta del catalogo con navegación de fotos por flechas.
  * Al pasar el cursor aparece el titular emocional de la propiedad: el dato
  * frio queda siempre visible y la promesa se revela como premio.
  */
@@ -19,6 +20,30 @@ export function PropertyCard({ propiedad, to, mostrarEstado = false, ancha = fal
   const queryClient = useQueryClient();
   const historia = propiedad.historia ?? {};
   const concepto = conceptOf(historia.concepto);
+
+  const fotos = (
+    propiedad.imagenes?.length
+      ? propiedad.imagenes.map((img) => (typeof img === 'string' ? img : img.url))
+      : [propiedad.imagenPrincipal]
+  ).filter(Boolean);
+
+  const [fotoIdx, setFotoIdx] = useState(0);
+
+  const handleCardPrev = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (fotos.length <= 1) return;
+    setFotoIdx((prev) => (prev - 1 + fotos.length) % fotos.length);
+  };
+
+  const handleCardNext = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (fotos.length <= 1) return;
+    setFotoIdx((prev) => (prev + 1) % fotos.length);
+  };
+
+  const fotoActual = fotos[fotoIdx] || propiedad.imagenPrincipal;
 
   const handlePrefetch = () => {
     prefetchPropertyExperience();
@@ -35,9 +60,40 @@ export function PropertyCard({ propiedad, to, mostrarEstado = false, ancha = fal
     <article className={ancha ? 'tarjeta tarjeta--ancha' : 'tarjeta'}>
       <Link to={to} onMouseEnter={handlePrefetch} onFocus={handlePrefetch}>
         <span className="tarjeta__foto">
-          {propiedad.imagenPrincipal
-            ? <SmartImage src={propiedad.imagenPrincipal} alt={propiedad.titulo} />
+          {fotoActual
+            ? <SmartImage src={fotoActual} alt={propiedad.titulo} />
             : <span className="tarjeta__vacia">{t('card.noImage')}</span>}
+
+          {fotos.length > 1 && (
+            <>
+              <button
+                type="button"
+                className="tarjeta__arrow tarjeta__arrow--prev"
+                onClick={handleCardPrev}
+                aria-label="Foto anterior"
+                title="Foto anterior"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                className="tarjeta__arrow tarjeta__arrow--next"
+                onClick={handleCardNext}
+                aria-label="Foto siguiente"
+                title="Foto siguiente"
+              >
+                ›
+              </button>
+              <div className="tarjeta__dots">
+                {fotos.slice(0, 5).map((_, i) => (
+                  <span
+                    key={i}
+                    className={`tarjeta__dot ${i === (fotoIdx % Math.min(fotos.length, 5)) ? 'is-active' : ''}`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
 
           <span className="tarjeta__cinta">{operationLabel(propiedad.operacion)}</span>
           {propiedad.destacada ? <span className="tarjeta__sello">{t('card.featured')}</span> : null}

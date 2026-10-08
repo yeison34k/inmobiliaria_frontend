@@ -178,6 +178,16 @@ export const es = {
     specsTitle: 'Especificaciones',
     dossierBtn: '📄 Ficha Ejecutiva PDF',
     manifestoKicker: 'La Historia',
+    gallery: {
+      kicker: 'Galería fotográfica',
+      title: 'Espacios y detalles',
+      prev: 'Foto anterior',
+      next: 'Foto siguiente',
+      carouselView: 'Carrusel con flechas',
+      mosaicView: 'Mosaico editorial',
+      fullscreen: 'Ampliar pantalla completa',
+      close: 'Cerrar galería',
+    },
     virtualTour: {
       kicker: 'Inmersión 3D Realista',
       title: 'Recorrido Virtual 3D Inmersivo',

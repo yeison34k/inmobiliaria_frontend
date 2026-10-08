@@ -178,6 +178,16 @@ export const en = {
     specsTitle: 'Key Specifications',
     dossierBtn: '📄 Executive PDF Dossier',
     manifestoKicker: 'The Story',
+    gallery: {
+      kicker: 'Photo Gallery',
+      title: 'Spaces and details',
+      prev: 'Previous photo',
+      next: 'Next photo',
+      carouselView: 'Carousel with arrows',
+      mosaicView: 'Editorial mosaic',
+      fullscreen: 'Full screen view',
+      close: 'Close gallery',
+    },
     virtualTour: {
       kicker: 'Realistic 3D Immersion',
       title: '3D Immersive Virtual Tour',
