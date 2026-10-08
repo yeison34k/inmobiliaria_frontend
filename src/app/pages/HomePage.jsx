@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState, useRef, useEffect, lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Reveal } from '@shared/ui/Reveal.jsx';
 import { Spinner } from '@shared/ui/Spinner.jsx';
@@ -22,6 +22,23 @@ export function HomePage() {
   const { t, formatNumber } = useTranslation();
   const [busqueda, setBusqueda] = useState({ q: '', operacion: 'venta' });
   const [ciudadFiltro, setCiudadFiltro] = useState(null);
+  const mapContainerRef = useRef(null);
+  const [mapInView, setMapInView] = useState(false);
+
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setMapInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+    observer.observe(mapContainerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const { data: destacadas } = useCatalogSearch({ destacada: 'true', orden: 'destacadas', pageSize: 6 });
   const { data: recientes, isLoading: cargando } = useCatalogSearch({ orden: 'recientes', pageSize: 8 });
@@ -203,30 +220,46 @@ export function HomePage() {
             ))}
           </div>
 
-          <div className="home-map-wrapper">
-            <Suspense
-              fallback={
-                <div
-                  style={{
-                    height: '500px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: 'var(--bg-elevated)',
-                    borderRadius: 'var(--radius-lg)',
-                    border: '1px solid var(--border)',
-                  }}
-                >
-                  <Spinner label={t('home.map.title')} />
-                </div>
-              }
-            >
-              <CatalogMap
-                propiedades={propiedadesParaMapa}
-                height="500px"
-                showFloatingCard={true}
-              />
-            </Suspense>
+          <div className="home-map-wrapper" ref={mapContainerRef}>
+            {mapInView ? (
+              <Suspense
+                fallback={
+                  <div
+                    style={{
+                      height: '500px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'var(--surface-muted)',
+                      borderRadius: 'var(--radius-lg)',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <Spinner label={t('home.map.title')} />
+                  </div>
+                }
+              >
+                <CatalogMap
+                  propiedades={propiedadesParaMapa}
+                  height="500px"
+                  showFloatingCard={true}
+                />
+              </Suspense>
+            ) : (
+              <div
+                style={{
+                  height: '500px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'var(--surface-muted)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px solid var(--border)',
+                }}
+              >
+                <Spinner label={t('home.map.title')} />
+              </div>
+            )}
           </div>
         </section>
 

@@ -11,7 +11,14 @@ export default defineConfig({
       '@features': fileURLToPath(new URL('./src/features', import.meta.url)),
     },
   },
+  esbuild: {
+    drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
+    legalComments: 'none',
+  },
   build: {
+    target: 'es2020',
+    cssCodeSplit: true,
+    minify: 'esbuild',
     rollupOptions: {
       output: {
         manualChunks(id) {

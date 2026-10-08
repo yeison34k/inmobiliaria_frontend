@@ -6,7 +6,16 @@
     <title>Inmobiliaria | Propiedades en venta y arriendo</title>
     <meta name="description" content="Catalogo de apartamentos, casas, lotes y oficinas en venta y arriendo." />
 
-    <!-- Tipografia: Inter (titulos e interfaz) + Roboto (texto largo) -->
+    <meta name="theme-color" content="#0f1115" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Open Graph / Redes Sociales -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Inmobiliaria" />
+    <meta property="og:title" content="Inmobiliaria | Propiedades exclusivas en venta y arriendo" />
+    <meta property="og:description" content="Catálogo exclusivo con fichas completas, planos arquitectónicos y recorridos virtuales 3D inmersivos." />
+
+    <!-- Tipografía: Conexiones tempranas y carga asíncrona no bloqueante (FCP / LCP Optimization) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://images.unsplash.com" />
@@ -16,7 +25,15 @@
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+      />
+    </noscript>
   </head>
   <body>
     <div id="root"></div>

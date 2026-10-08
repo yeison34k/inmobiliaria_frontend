@@ -1,0 +1,16 @@
+{
+  "name": "Inmobiliaria",
+  "short_name": "Inmobiliaria",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1115",
+  "theme_color": "#0f1115",
+  "description": "Catálogo inmobiliario exclusivo con fichas completas, planos arquitectónicos y recorridos virtuales 3D.",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
