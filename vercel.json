@@ -64,7 +64,7 @@
   ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!assets/|robots\\.txt|sitemap\\.xml|manifest\\.json|sw\\.js|.*\\.(?:ico|svg|png|jpg|jpeg|webp|avif|woff2|woff|ttf)).*)",
       "destination": "/index.html"
     }
   ]
