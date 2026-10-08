@@ -127,6 +127,17 @@
 
 /* --------------------------- filtros activos ---------------------------- */
 .catalogo__activos { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1.5rem; }
+@keyframes chipPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 .ficha-filtro {
   display: inline-flex; align-items: center; gap: .5rem;
   padding: .3rem .5rem .3rem .85rem;
@@ -136,10 +147,20 @@
   font-size: var(--text-xs);
   color: var(--text);
   cursor: pointer;
-  transition: border-color .15s ease;
+  animation: chipPopIn 0.25s var(--ease-fluid, cubic-bezier(0.16, 1, 0.3, 1)) both;
+  transition: border-color .2s ease,
+              transform .2s var(--ease-fluid, cubic-bezier(0.16, 1, 0.3, 1)),
+              box-shadow .2s var(--ease-fluid, cubic-bezier(0.16, 1, 0.3, 1)),
+              background .2s ease;
 }
-.ficha-filtro span { color: var(--text-faint); font-size: 1rem; line-height: 1; }
-.ficha-filtro:hover { border-color: var(--text); }
+.ficha-filtro span { color: var(--text-faint); font-size: 1rem; line-height: 1; transition: transform 0.2s ease; }
+.ficha-filtro:hover {
+  border-color: var(--text);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 10px -2px rgba(15, 17, 21, 0.08);
+}
+.ficha-filtro:hover span { transform: scale(1.15); color: var(--text); }
+.ficha-filtro:active { transform: translateY(0) scale(0.97); }
 .ficha-filtro--limpiar { background: none; color: var(--text-soft); padding-inline: .85rem; }
 
 /* -------------------------------- rejilla ------------------------------- */
@@ -154,7 +175,14 @@
 /* El envoltorio de animacion es la celda de la grilla: el span va aqui */
 .rejilla > .celda--ancha { grid-column: span 2; }
 
-.tarjeta { position: relative; }
+.tarjeta {
+  position: relative;
+  transition: transform 0.38s var(--ease-fluid, cubic-bezier(0.16, 1, 0.3, 1));
+  will-change: transform;
+}
+.tarjeta:hover {
+  transform: translateY(-5px);
+}
 .tarjeta a { display: grid; gap: .9rem; color: inherit; }
 
 .tarjeta__foto {
@@ -164,12 +192,17 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--surface-muted);
+  box-shadow: 0 4px 14px -4px rgba(15, 23, 42, 0.08);
+  transition: box-shadow 0.38s var(--ease-fluid, cubic-bezier(0.16, 1, 0.3, 1));
+}
+.tarjeta:hover .tarjeta__foto {
+  box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.18);
 }
 .tarjeta__foto img {
   width: 100%; height: 100%; object-fit: cover;
-  transition: transform .85s cubic-bezier(.22, .61, .36, 1), filter .4s ease;
+  transition: transform 0.85s var(--ease-fluid, cubic-bezier(0.16, 1, 0.3, 1)), filter .4s ease;
 }
-.tarjeta a:hover .tarjeta__foto img { transform: scale(1.055); filter: brightness(.82); }
+.tarjeta a:hover .tarjeta__foto img { transform: scale(1.055); filter: brightness(.88); }
 .tarjeta__vacia { display: grid; place-items: center; height: 100%; color: var(--text-faint); font-size: var(--text-xs); }
 
 .tarjeta__cinta {
@@ -188,9 +221,17 @@
   letter-spacing: .08em; text-transform: uppercase;
   padding: .24rem .6rem; border-radius: 4px;
 }
+@keyframes tourBadgePulse {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(56, 189, 248, 0.5);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 5px rgba(56, 189, 248, 0);
+  }
+}
 .tarjeta__tour3d {
   position: absolute; right: .8rem; bottom: .8rem; z-index: 3;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(56, 189, 248, 0.4);
@@ -199,14 +240,14 @@
   font-size: .625rem; font-weight: 700;
   letter-spacing: .08em; text-transform: uppercase;
   padding: .24rem .55rem; border-radius: 999px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  transition: transform .25s ease, background .25s ease, color .25s ease;
+  animation: tourBadgePulse 3s ease-in-out infinite;
+  transition: transform .25s var(--ease-fluid, cubic-bezier(0.16, 1, 0.3, 1)), background .25s ease, color .25s ease, border-color .25s ease;
 }
 .tarjeta a:hover .tarjeta__tour3d {
-  transform: translateY(-2px);
-  background: rgba(2, 132, 199, 0.92);
+  transform: translateY(-2px) scale(1.04);
+  background: rgba(2, 132, 199, 0.95);
   color: #fff;
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* El titular emocional se revela al pasar el cursor */
@@ -247,6 +288,10 @@
   font-size: var(--text-base); font-weight: 600;
   letter-spacing: -.02em;
   line-height: 1.35;
+  transition: color 0.22s ease;
+}
+.tarjeta a:hover .tarjeta__nombre {
+  color: var(--accent);
 }
 .tarjeta__datos { font-size: var(--text-xs); color: var(--text-soft); }
 .tarjeta__pie {
@@ -356,18 +401,23 @@
   background: transparent;
   color: var(--text-soft);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.22s var(--ease-fluid, cubic-bezier(0.16, 1, 0.3, 1)),
+              color 0.2s ease,
+              background 0.2s ease,
+              box-shadow 0.2s ease;
 }
 
 .catalogo__vista-btn:hover {
   color: var(--text);
+  transform: translateY(-1px);
 }
 
 .catalogo__vista-btn.is-active {
   background: var(--surface);
   color: var(--text);
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  transform: scale(1.02);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
 }
 
 /* Disposición Dividida (Split View) */

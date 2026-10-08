@@ -63,10 +63,11 @@
   z-index: 40;
   transform: translate(-50%, 220%);
   box-shadow: 0 16px 40px -12px rgba(0, 0, 0, .45);
-  transition: transform .45s var(--exp-ease);
+  transition: transform .55s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, filter 0.3s ease;
 }
 .exp-cta--flotante.is-visible { transform: translate(-50%, 0); }
-.exp-cta--flotante:hover { transform: translate(-50%, -2px); }
+.exp-cta--flotante:hover { transform: translate(-50%, -3px); box-shadow: 0 20px 50px -10px rgba(0, 0, 0, .55); }
+.exp-cta--flotante:active { transform: translate(-50%, 0) scale(0.98); }
 
 /* --------------------------- 1. EL GRAN IMPACTO -------------------------- */
 .exp-hero {
@@ -917,13 +918,15 @@
 .exp-tour__hotspot-btn:hover {
   border-color: var(--exp-accent);
   background: var(--exp-bg);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .exp-tour__hotspot-btn.is-active {
   background: var(--exp-accent);
   color: var(--exp-on-accent);
   border-color: var(--exp-accent);
+  transform: scale(1.02);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
   font-weight: 600;
 }
@@ -1284,18 +1287,28 @@
 /* =========================================================================
    DOSSIER EJECUTIVO COMERCIAL & FICHA IMPRIMIBLE CON QR
    ========================================================================= */
+@keyframes dossierOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes dossierModalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(14px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 .dossier-overlay {
   position: fixed;
   inset: 0;
   z-index: 10000;
   background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
   overflow-y: auto;
+  animation: dossierOverlayIn 0.3s ease-out both;
 }
 
 .dossier-modal {
@@ -1309,6 +1322,7 @@
   flex-direction: column;
   overflow: hidden;
   box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
+  animation: dossierModalIn 0.4s var(--exp-ease, cubic-bezier(0.16, 1, 0.3, 1)) both;
 }
 
 .dossier-modal__topbar {

@@ -165,12 +165,12 @@
   border: 3px solid var(--mc-card);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.22s var(--ease-fluid, cubic-bezier(0.16, 1, 0.3, 1)), box-shadow 0.22s ease;
 }
 
 .mortgage-range::-webkit-slider-thumb:hover {
-  transform: scale(1.18);
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+  transform: scale(1.22);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--mc-accent) 25%, transparent), 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 
 .mortgage-range::-moz-range-thumb {
@@ -199,7 +199,11 @@
   padding: 0.35rem 0.75rem;
   border-radius: 999px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s var(--ease-fluid, cubic-bezier(0.16, 1, 0.3, 1)),
+              border-color 0.2s ease,
+              background 0.2s ease,
+              color 0.2s ease,
+              box-shadow 0.2s ease;
   font-family: inherit;
 }
 
@@ -207,6 +211,8 @@
   border-color: var(--mc-accent);
   color: var(--mc-ink);
   background: color-mix(in srgb, var(--mc-accent) 8%, transparent);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.08);
 }
 
 .mortgage-chip--active {
@@ -214,12 +220,15 @@
   border-color: var(--mc-accent);
   color: var(--mc-on-accent);
   font-weight: 600;
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px -2px rgba(15, 118, 110, 0.3);
 }
 
 .mortgage-chip--active:hover {
   background: var(--mc-accent);
   color: var(--mc-on-accent);
-  filter: brightness(1.1);
+  filter: brightness(1.08);
+  transform: translateY(-1px) scale(1.04);
 }
 
 /* Input numérico de tasa */
