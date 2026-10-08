@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SmartImage } from '@shared/ui/SmartImage.jsx';
 
@@ -18,7 +18,7 @@ const menosMovimiento = () =>
  */
 export function HeroBackdrop({ propiedades = [] }) {
   const [indice, setIndice] = useState(0);
-  const [desplazamiento, setDesplazamiento] = useState(0);
+  const fondoRef = useRef(null);
   const conFoto = propiedades.filter((p) => p.imagenPrincipal);
 
   useEffect(() => {
@@ -29,19 +29,30 @@ export function HeroBackdrop({ propiedades = [] }) {
     return () => clearInterval(timer);
   }, [conFoto.length]);
 
-  // Parallax: el fondo baja mas lento que la pagina
+  // Parallax: desplazamiento fluido del fondo por RAF sin re-renderizar React
   useEffect(() => {
     if (menosMovimiento()) return undefined;
+    const fondo = fondoRef.current;
+    if (!fondo) return undefined;
+
     let frame = null;
     const calcular = () => {
       frame = null;
-      setDesplazamiento(Math.min(window.scrollY * 0.28, 220));
+      const scrollY = window.scrollY;
+      if (scrollY > window.innerHeight + 100) return;
+      const y = Math.round(scrollY * 0.36);
+      fondo.style.transform = `translate3d(0, ${y}px, 0)`;
     };
-    const onScroll = () => { if (frame === null) frame = requestAnimationFrame(calcular); };
+    const onScroll = () => {
+      if (frame === null) frame = requestAnimationFrame(calcular);
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    calcular();
     return () => {
       if (frame !== null) cancelAnimationFrame(frame);
       window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
     };
   }, []);
 
@@ -52,9 +63,9 @@ export function HeroBackdrop({ propiedades = [] }) {
   return (
     <>
       <div
+        ref={fondoRef}
         className="portada__fondo"
         aria-hidden="true"
-        style={{ transform: `translate3d(0, ${desplazamiento}px, 0)` }}
       >
         {conFoto.map((propiedad, i) => (
           <SmartImage

@@ -48,7 +48,7 @@ export function useReveal({ threshold = 0.18, once = true } = {}) {
  * ese tope la imagen se sale del marco recortado y el hueco queda vacio.
  * El `scale` del CSS debe dejar al menos ese margen (2 * limite).
  */
-export function useParallax(intensidad = 0.12, limite = 0.08) {
+export function useParallax(intensidad = 0.14, limite = 0.18) {
   const ref = useRef(null);
   const [offset, setOffset] = useState(0);
 
@@ -65,7 +65,7 @@ export function useParallax(intensidad = 0.12, limite = 0.08) {
         isInView = entry.isIntersecting;
         if (isInView) calcular();
       },
-      { rootMargin: '50px' }
+      { rootMargin: '120px' }
     );
     observer.observe(nodo);
 
@@ -77,7 +77,13 @@ export function useParallax(intensidad = 0.12, limite = 0.08) {
       const centro = rect.top + rect.height / 2 - window.innerHeight / 2;
       const tope = rect.height * limite;
       const nuevoOffset = Math.round(Math.max(-tope, Math.min(tope, -centro * intensidad)));
-      setOffset((prev) => (Math.abs(prev - nuevoOffset) >= 1 ? nuevoOffset : prev));
+
+      const img = nodo.querySelector('img');
+      if (img) {
+        img.style.transform = `translate3d(0, ${nuevoOffset}px, 0) scale(1.22)`;
+      } else {
+        setOffset((prev) => (Math.abs(prev - nuevoOffset) >= 1 ? nuevoOffset : prev));
+      }
     };
 
     const onScroll = () => {

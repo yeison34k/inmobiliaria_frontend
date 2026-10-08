@@ -20,7 +20,17 @@
   color: #fff;
 }
 
-.portada__fondo { position: absolute; inset: 0; z-index: -1; background: #0d0e11; }
+.portada__fondo {
+  position: absolute;
+  top: -12%;
+  left: 0;
+  right: 0;
+  height: 124%;
+  z-index: -1;
+  background: #0d0e11;
+  will-change: transform;
+  transform-origin: center center;
+}
 .portada__fondo img {
   position: absolute;
   inset: 0;

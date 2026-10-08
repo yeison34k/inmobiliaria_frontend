@@ -271,7 +271,7 @@ export function EditorialGallery({ propiedad }) {
               key={imagen.id ?? index}
               imagen={imagen}
               index={index}
-              intensidad={imagen.formato === 'detalle' ? 0.16 : 0.07}
+              intensidad={imagen.formato === 'detalle' ? 0.22 : 0.14}
               onOpen={setLightboxIdx}
             />
           ))}
