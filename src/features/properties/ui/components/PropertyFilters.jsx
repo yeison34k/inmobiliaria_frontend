@@ -7,10 +7,26 @@ import { useTranslation } from '@shared/i18n/index.js';
 const HABITACIONES_VALORES = [undefined, 1, 2, 3, 4];
 const BANOS_VALORES = [undefined, 1, 2, 3];
 
+const PRECIO_PRESETS_VENTA = [
+  { label: '< $300M', min: undefined, max: 300000000 },
+  { label: '$300M - $600M', min: 300000000, max: 600000000 },
+  { label: '$600M - $1.200M', min: 600000000, max: 1200000000 },
+  { label: '> $1.200M', min: 1200000000, max: undefined },
+];
+
+const PRECIO_PRESETS_ARRIENDO = [
+  { label: '< $2M', min: undefined, max: 2000000 },
+  { label: '$2M - $4M', min: 2000000, max: 4000000 },
+  { label: '$4M - $8M', min: 4000000, max: 8000000 },
+  { label: '> $8M', min: 8000000, max: undefined },
+];
+
 /**
- * Filtros del catalogo.
- * Lo que mas se usa (operacion y tipo) va como chips a un clic; el resto
- * vive detras de "Mas filtros" para no abrumar en la primera pantalla.
+ * Filtros y buscador del catálogo de propiedades:
+ * - Campo de búsqueda reactivo con botón de borrado inmediato.
+ * - Segmentación rápida por Operación y Tipo de inmueble.
+ * - Filtros combinables: Ciudad, Rango de precio con atajos, Habitaciones, Baños, Área, Tour 3D.
+ * - Ordenamiento múltiple (recientes, precio, área).
  */
 export function PropertyFilters({ valores, onChange, total }) {
   const { t, typeLabel, isEn } = useTranslation();
@@ -45,19 +61,37 @@ export function PropertyFilters({ valores, onChange, total }) {
     });
   };
 
+  const presetsPrecio = valores.operacion === 'arriendo'
+    ? PRECIO_PRESETS_ARRIENDO
+    : PRECIO_PRESETS_VENTA;
+
   return (
     <div className="buscador">
+      {/* Barra de Búsqueda Principal */}
       <div className="buscador__principal">
-        <label className="buscador__campo">
+        <div className="buscador__campo">
           <span className="buscador__icono" aria-hidden="true">⌕</span>
           <input
             type="search"
             placeholder={t('catalog.filters.searchPlaceholder')}
             value={valores.q ?? ''}
             onChange={(e) => set({ q: e.target.value })}
+            aria-label={t('catalog.filters.searchPlaceholder')}
           />
-        </label>
+          {valores.q && (
+            <button
+              type="button"
+              className="buscador__limpiar-campo"
+              onClick={() => set({ q: '' })}
+              aria-label="Borrar búsqueda"
+              title="Borrar texto"
+            >
+              ✕
+            </button>
+          )}
+        </div>
 
+        {/* Tipo de Operación: Todo / Comprar / Arrendar */}
         <div className="segmentado" role="group" aria-label={t('catalog.filters.operation.all')}>
           {operaciones.map((op) => (
             <button
@@ -71,6 +105,7 @@ export function PropertyFilters({ valores, onChange, total }) {
           ))}
         </div>
 
+        {/* Selector de Ciudad */}
         <select
           aria-label={isEn ? 'City' : 'Ciudad'}
           className="buscador__select"
@@ -83,6 +118,7 @@ export function PropertyFilters({ valores, onChange, total }) {
           ))}
         </select>
 
+        {/* Selector de Ordenamiento */}
         <select
           aria-label={t('catalog.filters.sort')}
           className="buscador__select"
@@ -93,6 +129,7 @@ export function PropertyFilters({ valores, onChange, total }) {
         </select>
       </div>
 
+      {/* Píldoras de Tipos de Inmueble y Botón de Más Filtros */}
       <div className="buscador__tipos">
         <button
           type="button"
@@ -139,28 +176,51 @@ export function PropertyFilters({ valores, onChange, total }) {
         ) : null}
       </div>
 
+      {/* Panel Desplegable de Filtros Avanzados */}
       {abierto ? (
         <div className="buscador__avanzados">
-          <label>
-            <span>{t('catalog.filters.priceMin')}</span>
-            <input
-              type="number" min="0" placeholder="0"
-              value={valores.precioMin ?? ''}
-              onChange={(e) => set({ precioMin: e.target.value || undefined })}
-            />
-          </label>
+          {/* Rangos de Precio */}
+          <div className="buscador__precio-col">
+            <span className="buscador__grupo-label">{t('catalog.filters.priceRange')}</span>
+            <div className="buscador__input-duo">
+              <label>
+                <span>{t('catalog.filters.priceMin')}</span>
+                <input
+                  type="number" min="0" placeholder="0"
+                  value={valores.precioMin ?? ''}
+                  onChange={(e) => set({ precioMin: e.target.value || undefined })}
+                />
+              </label>
+              <label>
+                <span>{t('catalog.filters.priceMax')}</span>
+                <input
+                  type="number" min="0" placeholder={isEn ? 'No limit' : 'Sin límite'}
+                  value={valores.precioMax ?? ''}
+                  onChange={(e) => set({ precioMax: e.target.value || undefined })}
+                />
+              </label>
+            </div>
+            {/* Atajos de precio preestablecidos */}
+            <div className="buscador__presets-fila">
+              {presetsPrecio.map((preset) => {
+                const activo = valores.precioMin === preset.min && valores.precioMax === preset.max;
+                return (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    className={`buscador__preset-btn ${activo ? 'is-activo' : ''}`}
+                    onClick={() => set({ precioMin: preset.min, precioMax: preset.max })}
+                  >
+                    {preset.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-          <label>
-            <span>{t('catalog.filters.priceMax')}</span>
-            <input
-              type="number" min="0" placeholder={isEn ? 'No limit' : 'Sin límite'}
-              value={valores.precioMax ?? ''}
-              onChange={(e) => set({ precioMax: e.target.value || undefined })}
-            />
-          </label>
-
+          {/* Habitaciones */}
           <div>
-            <span style={{ fontSize: 'var(--text-xs)', fontWeight: 500, color: 'var(--text-faint)', display: 'block', marginBottom: '0.25rem' }}>
+            <span className="buscador__grupo-label">
               {t('catalog.filters.rooms')}
             </span>
             <div style={{ display: 'flex', gap: '0.3rem' }}>
@@ -172,8 +232,8 @@ export function PropertyFilters({ valores, onChange, total }) {
                     type="button"
                     className={`btn btn--ghost btn--sm ${valores.habitacionesMin === h ? 'is-activo' : ''}`}
                     style={{
-                      padding: '0.25rem 0.55rem',
-                      fontSize: '0.78rem',
+                      padding: '0.35rem 0.65rem',
+                      fontSize: '0.82rem',
                       background: valores.habitacionesMin === h ? 'var(--text)' : undefined,
                       color: valores.habitacionesMin === h ? '#ffffff' : undefined,
                     }}
@@ -186,8 +246,9 @@ export function PropertyFilters({ valores, onChange, total }) {
             </div>
           </div>
 
+          {/* Baños */}
           <div>
-            <span style={{ fontSize: 'var(--text-xs)', fontWeight: 500, color: 'var(--text-faint)', display: 'block', marginBottom: '0.25rem' }}>
+            <span className="buscador__grupo-label">
               {t('catalog.filters.baths')}
             </span>
             <div style={{ display: 'flex', gap: '0.3rem' }}>
@@ -199,8 +260,8 @@ export function PropertyFilters({ valores, onChange, total }) {
                     type="button"
                     className={`btn btn--ghost btn--sm ${valores.banosMin === b ? 'is-activo' : ''}`}
                     style={{
-                      padding: '0.25rem 0.55rem',
-                      fontSize: '0.78rem',
+                      padding: '0.35rem 0.65rem',
+                      fontSize: '0.82rem',
                       background: valores.banosMin === b ? 'var(--text)' : undefined,
                       color: valores.banosMin === b ? '#ffffff' : undefined,
                     }}
@@ -213,15 +274,20 @@ export function PropertyFilters({ valores, onChange, total }) {
             </div>
           </div>
 
-          <label>
-            <span>{t('catalog.filters.areaMin')}</span>
-            <input
-              type="number" min="0" placeholder="0"
-              value={valores.areaMin ?? ''}
-              onChange={(e) => set({ areaMin: e.target.value || undefined })}
-            />
-          </label>
+          {/* Área Mínima */}
+          <div>
+            <span className="buscador__grupo-label">{t('catalog.filters.areaRange')}</span>
+            <label>
+              <span>{t('catalog.filters.areaMin')}</span>
+              <input
+                type="number" min="0" placeholder="0 m²"
+                value={valores.areaMin ?? ''}
+                onChange={(e) => set({ areaMin: e.target.value || undefined })}
+              />
+            </label>
+          </div>
 
+          {/* Reset avanzado */}
           {avanzadosActivos > 0 && (
             <div style={{ display: 'flex', alignItems: 'flex-end' }}>
               <button
