@@ -17,7 +17,7 @@ export function Neighborhood({ propiedad }) {
   }, {});
 
   return (
-    <section className="exp-section exp-barrio">
+    <section className="exp-section exp-barrio" id="seccion-entorno">
       <Reveal>
         <p className="exp-kicker">{isEn ? 'Neighborhood & Lifestyle' : 'El entorno'}</p>
         <h2 className="exp-title">

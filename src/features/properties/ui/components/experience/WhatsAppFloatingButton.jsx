@@ -5,11 +5,18 @@ import { useTranslation } from '@shared/i18n/index.js';
  * Botón Flotante de WhatsApp Comercial con mensaje contextual prellenado.
  * Facilita la conversión inmediata del cliente potencial hacia el asesor.
  */
-export function WhatsAppFloatingButton({ propiedad, telefono = '573001234567' }) {
+export function WhatsAppFloatingButton({ propiedad, telefono }) {
   const { formatMoney, isEn } = useTranslation();
   const [tooltipVisible, setTooltipVisible] = useState(false);
 
   if (!propiedad) return null;
+
+  const rawPhone = telefono || propiedad?.asesor?.whatsapp || propiedad?.asesor?.telefono || '573001234567';
+  let clean = String(rawPhone).replace(/\D/g, '');
+  if (clean.length === 10 && !clean.startsWith('57')) {
+    clean = `57${clean}`;
+  }
+  const targetPhone = clean || '573001234567';
 
   const nombre = propiedad.nombrePublico || propiedad.titulo;
   const precio = formatMoney(propiedad.precio, propiedad.moneda);
@@ -21,7 +28,7 @@ export function WhatsAppFloatingButton({ propiedad, telefono = '573001234567' })
     ? `Hello! I would like to receive advisory and schedule a viewing for:\n*${nombre}* (Ref: ${ref})\n💰 Price: ${precio}\n📍 Location: ${lugar}\n🔗 Link: ${link}`
     : `¡Hola! Me interesa recibir asesoría y agendar una visita para:\n*${nombre}* (Ref: ${ref})\n💰 Precio: ${precio}\n📍 Ubicación: ${lugar}\n🔗 Enlace: ${link}`;
 
-  const whatsappHref = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
+  const whatsappHref = `https://wa.me/${targetPhone}?text=${encodeURIComponent(mensaje)}`;
 
   return (
     <aside className="exp-wa-floater" aria-label={isEn ? 'Contact via WhatsApp' : 'Contacto por WhatsApp'}>

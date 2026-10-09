@@ -14,7 +14,7 @@ export function ExperienceManifesto({ propiedad }) {
   const parrafos = texto.split(/\n{2,}/).filter(Boolean);
 
   return (
-    <section className="exp-section exp-manifesto">
+    <section className="exp-section exp-manifesto" id="seccion-historia">
       <Reveal className="exp-manifesto__aside" as="aside">
         <p className="exp-kicker">{isEn ? 'The Story' : 'La historia'}</p>
       </Reveal>

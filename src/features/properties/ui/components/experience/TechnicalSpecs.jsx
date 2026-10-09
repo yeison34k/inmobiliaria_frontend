@@ -35,7 +35,7 @@ export function TechnicalSpecs({ propiedad }) {
     .filter((fila) => fila.valor !== null);
 
   return (
-    <section className="exp-section exp-datos">
+    <section className="exp-section exp-datos" id="seccion-ficha">
       <Reveal>
         <p className="exp-kicker">{isEn ? 'Specifications' : 'Ficha técnica'}</p>
       </Reveal>

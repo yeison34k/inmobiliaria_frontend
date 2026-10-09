@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@shared/ui/Spinner.jsx';
 import { ErrorState } from '@shared/ui/ErrorState.jsx';
 import { Reveal } from '@shared/ui/Reveal.jsx';
 import { LanguageSwitcher } from '@shared/ui/LanguageSwitcher.jsx';
 import { useTranslation } from '@shared/i18n/index.js';
 import { InquiryForm } from '@features/inquiries';
+import { settingsApi } from '@features/settings';
 import { useCatalogProperty } from '../../application/usePropertiesQueries.js';
 import { conceptOf, conceptStyle, ensureConceptFont } from '../../domain/concepts.js';
 import { ExperienceHero } from '../components/experience/ExperienceHero.jsx';
@@ -16,6 +18,7 @@ import { TechnicalSpecs } from '../components/experience/TechnicalSpecs.jsx';
 import { FloorPlans } from '../components/experience/FloorPlans.jsx';
 import { Neighborhood } from '../components/experience/Neighborhood.jsx';
 import { ShareButtons } from '../components/ShareButtons.jsx';
+import { ExperienceSectionNav } from '../components/experience/ExperienceSectionNav.jsx';
 import { WhatsAppFloatingButton } from '../components/experience/WhatsAppFloatingButton.jsx';
 
 const PropertyLocationMap = lazy(() =>
@@ -36,6 +39,11 @@ const MortgageCalculator = lazy(() =>
 export function PropertyExperiencePage() {
   const { slug } = useParams();
   const { data: propiedad, isLoading, error, refetch } = useCatalogProperty(slug);
+  const { data: configuracion } = useQuery({
+    queryKey: ['settings-public'],
+    queryFn: () => settingsApi.get(),
+    staleTime: 1000 * 60 * 15,
+  });
   const { t, formatMoney, isEn } = useTranslation();
   const contactoRef = useRef(null);
   const [ctaVisible, setCtaVisible] = useState(false);
@@ -153,7 +161,7 @@ export function PropertyExperiencePage() {
       <Neighborhood propiedad={propiedad} />
 
       {propiedad.operacion === 'venta' ? (
-        <section className="exp-section exp-calculadora">
+        <section className="exp-section exp-calculadora" id="calculadora-hipotecaria">
           <Suspense fallback={<div style={{ minHeight: '150px' }}><Spinner label={isEn ? 'Loading calculator...' : 'Cargando simulador...'} /></div>}>
             <MortgageCalculator
               precio={propiedad.precio}
@@ -164,7 +172,7 @@ export function PropertyExperiencePage() {
         </section>
       ) : null}
 
-      <section className="exp-section exp-contacto" ref={contactoRef}>
+      <section className="exp-section exp-contacto" id="seccion-contacto" ref={contactoRef}>
         <Reveal className="exp-contacto__texto">
           <p className="exp-kicker">{t('experience.contact.kicker')}</p>
           <h2 className="exp-title">
@@ -187,6 +195,9 @@ export function PropertyExperiencePage() {
         <span>{propiedad.codigo}</span>
       </footer>
 
+      {/* Navegación rápida interactiva de secciones & ScrollSpy */}
+      <ExperienceSectionNav propiedad={propiedad} />
+
       <button
         type="button"
         className={`exp-cta exp-cta--flotante ${ctaVisible ? 'is-visible' : ''}`}
@@ -195,7 +206,10 @@ export function PropertyExperiencePage() {
         {propiedad.historia?.ctaTexto ?? t('experience.contact.ctaFloating')}
       </button>
 
-      <WhatsAppFloatingButton propiedad={propiedad} />
+      <WhatsAppFloatingButton
+        propiedad={propiedad}
+        telefono={propiedad.asesor?.whatsapp || propiedad.asesor?.telefono || configuracion?.whatsapp || configuracion?.telefono}
+      />
     </article>
   );
 }
