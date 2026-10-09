@@ -35,13 +35,33 @@ export const formatMoney = (value, moneda = 'COP', locale = getActiveLocale()) =
   }
 };
 
-/** Version compacta para KPIs: $ 1.250 M */
+/**
+ * Version compacta para KPIs: "$ 25,5 M", "$ 3.400 M".
+ *
+ * Todo lo que pasa del millon se expresa en millones, con una sola unidad.
+ * Antes convivian "M" y "MM", y en espanol "MM" se lee como millones: un KPI
+ * de "$ 3.4 MM" se podia entender como tres millones y medio cuando eran tres
+ * mil cuatrocientos. Ademas el corte por valor crudo mostraba "$ 1000.0 M"
+ * justo antes de saltar a "$ 1.0 MM".
+ *
+ * El numero va por Intl y no por toFixed, para que el separador decimal sea el
+ * del idioma: "3,4" en espanol, donde el punto separa miles.
+ */
 export const formatMoneyShort = (value, moneda = 'COP', locale = getActiveLocale()) => {
   const n = Number(value ?? 0);
-  const symbol = moneda === 'USD' ? 'US$' : '$';
-  if (Math.abs(n) >= 1_000_000_000) return `${symbol} ${(n / 1_000_000_000).toFixed(1)} MM`;
-  if (Math.abs(n) >= 1_000_000) return `${symbol} ${(n / 1_000_000).toFixed(1)} M`;
-  return formatMoney(n, moneda, locale);
+  if (!Number.isFinite(n)) return '-';
+  if (Math.abs(n) < 1_000_000) return formatMoney(n, moneda, locale);
+
+  const simbolo = moneda === 'USD' ? 'US$' : '$';
+  const millones = n / 1_000_000;
+  // Bajo mil millones un decimal informa; por encima ya no aporta nada
+  const decimales = Math.abs(millones) < 1000 ? 1 : 0;
+  const texto = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: decimales,
+    maximumFractionDigits: decimales,
+  }).format(millones);
+
+  return `${simbolo} ${texto} M`;
 };
 
 export const formatArea = (value, locale = getActiveLocale()) =>
@@ -53,7 +73,15 @@ export const formatDate = (value, locale = getActiveLocale()) =>
 export const formatDateTime = (value, locale = getActiveLocale()) =>
   value ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '-';
 
-export const formatPercent = (value) => `${Number(value ?? 0).toFixed(1)}%`;
+/** El separador decimal sigue al idioma: "3,5%" en espanol, "3.5%" en ingles. */
+export const formatPercent = (value, locale = getActiveLocale()) => {
+  const n = Number(value ?? 0);
+  if (!Number.isFinite(n)) return '-';
+  return `${new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(n)}%`;
+};
 
 export const relativeDays = (value, locale = getActiveLocale()) => {
   if (!value) return '-';
