@@ -7,17 +7,30 @@ import { detailsSummary } from '../../domain/detailSpecs.js';
 
 import { TILE_SERVERS } from '@shared/lib/mapConfig.js';
 
+/**
+ * Precio corto para el globo del marcador.
+ *
+ * Todo lo que pasa del millon se dice en millones, igual que los KPI del
+ * panel. Antes habia una rama en "B": en espanol un billon es un millon de
+ * millones, asi que "$3.4B" se leia como mil veces el precio real. Y el
+ * separador decimal sale de Intl, no de toFixed, para que en espanol sea
+ * la coma.
+ */
 function formatShortPrice(val, operacion) {
   if (!val) return '$0';
-  if (val >= 1_000_000_000) {
-    const b = (val / 1_000_000_000).toFixed(1).replace('.0', '');
-    return `$${b}B${operacion === 'arriendo' ? '/m' : ''}`;
-  }
+  const sufijo = operacion === 'arriendo' ? '/m' : '';
+
   if (val >= 1_000_000) {
-    const m = (val / 1_000_000).toFixed(val % 1_000_000 === 0 ? 0 : 1);
-    return `$${m}M${operacion === 'arriendo' ? '/m' : ''}`;
+    const millones = val / 1_000_000;
+    const decimales = millones >= 100 || Number.isInteger(millones) ? 0 : 1;
+    const texto = new Intl.NumberFormat('es-CO', {
+      minimumFractionDigits: decimales,
+      maximumFractionDigits: decimales,
+    }).format(millones);
+    return `$${texto}M${sufijo}`;
   }
-  return `$${(val / 1000).toFixed(0)}k`;
+
+  return `$${new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(val / 1000)}k${sufijo}`;
 }
 
 /**
