@@ -40,6 +40,8 @@ export function EditorialGallery({ propiedad }) {
   const [lightboxIdx, setLightboxIdx] = useState(null);
   const [viewMode, setViewMode] = useState('carrusel'); // 'carrusel' | 'mosaico'
 
+  const thumbsContainerRef = useRef(null);
+  const isFirstMount = useRef(true);
   const thumbRefs = useRef([]);
   const touchStartX = useRef(null);
 
@@ -90,11 +92,17 @@ export function EditorialGallery({ propiedad }) {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [lightboxIdx, prevLightbox, nextLightbox]);
 
-  // Centrar miniatura activa en el visor
+  // Centrar miniatura activa dentro de la tira horizontal (únicamente en el contenedor, sin alterar el scroll de la ventana)
   useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
+    const container = thumbsContainerRef.current;
     const el = thumbRefs.current[activeIdx];
-    if (el && typeof el.scrollIntoView === 'function') {
-      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    if (container && el) {
+      const targetLeft = el.offsetLeft - container.offsetWidth / 2 + el.offsetWidth / 2;
+      container.scrollTo({ left: targetLeft, behavior: 'smooth' });
     }
   }, [activeIdx]);
 
@@ -242,7 +250,7 @@ export function EditorialGallery({ propiedad }) {
 
           {/* Tira inferior de miniaturas navegables */}
           {total > 1 && (
-            <div className="exp-galeria__thumbs" role="tablist" aria-label="Miniaturas de la galería">
+            <div className="exp-galeria__thumbs" ref={thumbsContainerRef} role="tablist" aria-label="Miniaturas de la galería">
               {list.map((img, i) => (
                 <button
                   key={img.id ?? i}

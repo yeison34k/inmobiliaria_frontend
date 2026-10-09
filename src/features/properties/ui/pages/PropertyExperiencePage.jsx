@@ -58,6 +58,13 @@ export function PropertyExperiencePage() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Garantizar que cada vez que se abre una propiedad el scroll comience en el encabezado superior
+  useEffect(() => {
+    if (!window.location.hash) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+  }, [slug]);
+
   useEffect(() => {
     if (propiedad && window.location.hash) {
       const id = window.location.hash.replace('#', '');

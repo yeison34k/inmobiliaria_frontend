@@ -99,7 +99,7 @@ export function ExperienceHero({ propiedad, onCta }) {
   }, []);
 
   return (
-    <header className="exp-hero" ref={heroRef}>
+    <header className="exp-hero" id="encabezado" ref={heroRef}>
       <div className="exp-hero__media" ref={mediaRef}>
         {esArchivoDeVideo(historia.videoUrl) ? (
           <video src={historia.videoUrl} autoPlay muted loop playsInline poster={portada ?? undefined} />
