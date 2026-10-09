@@ -1,3 +1,4 @@
+import { ARRIENDOS } from '@app/config/features.js';
 import { useMemo, useState, lazy, Suspense } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ErrorState } from '@shared/ui/ErrorState.jsx';
@@ -170,9 +171,11 @@ export function CatalogPage() {
             <Link className="btn btn--ghost" to="/propiedades?operacion=venta">
               {isEn ? 'Only for sale' : 'Solo venta'}
             </Link>
-            <Link className="btn btn--ghost" to="/propiedades?operacion=arriendo">
-              {isEn ? 'Only for rent' : 'Solo arriendo'}
-            </Link>
+            {ARRIENDOS ? (
+              <Link className="btn btn--ghost" to="/propiedades?operacion=arriendo">
+                {isEn ? 'Only for rent' : 'Solo arriendo'}
+              </Link>
+            ) : null}
           </div>
         </div>
       ) : null}

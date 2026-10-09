@@ -110,7 +110,7 @@ export function ExperienceHero({ propiedad, onCta }) {
             src={portada}
             alt={propiedad.nombrePublico || propiedad.titulo}
             loading="eager"
-            fetchPriority="high"
+            fetchpriority="high"
             decoding="sync"
           />
         ) : (

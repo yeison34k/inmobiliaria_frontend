@@ -1,3 +1,4 @@
+import { ARRIENDOS } from '@app/config/features.js';
 import { Link } from 'react-router-dom';
 import { StatCard } from '@shared/ui/StatCard.jsx';
 import { Spinner } from '@shared/ui/Spinner.jsx';
@@ -74,7 +75,7 @@ export function DashboardPage() {
           hint={<Link to="/admin/consultas">Ver bandeja</Link>}
           tone="info"
         />
-        {arrendamientos ? (
+        {ARRIENDOS && arrendamientos ? (
           <>
             <StatCard
               label="Cánones en cartera"

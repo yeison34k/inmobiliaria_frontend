@@ -71,14 +71,6 @@ export function CommandPalette({ isOpen, onClose }) {
         perform: () => navigate('/admin/operaciones'),
       },
       {
-        id: 'act-arrendamientos',
-        group: 'Acciones Rápidas',
-        title: 'Arrendamientos & Liquidaciones',
-        subtitle: 'Cánones mensuales, pólizas de fianza y extractos de giro',
-        icon: '🔑',
-        perform: () => navigate('/admin/arrendamientos'),
-      },
-      {
         id: 'act-documentos',
         group: 'Acciones Rápidas',
         title: 'Gestión Documental',

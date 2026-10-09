@@ -1,3 +1,4 @@
+import { ARRIENDOS } from '@app/config/features.js';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Spinner } from '@shared/ui/Spinner.jsx';
@@ -108,9 +109,9 @@ export function OperationsPage() {
           ))}
         </select>
         <select value={filtros.tipo} onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value, page: 1 })}>
-          <option value="">Venta y arriendo</option>
+          <option value="">{ARRIENDOS ? 'Venta y arriendo' : 'Todas'}</option>
           <option value="venta">Venta</option>
-          <option value="arriendo">Arriendo</option>
+          {ARRIENDOS ? <option value="arriendo">Arriendo</option> : null}
         </select>
       </form>
 

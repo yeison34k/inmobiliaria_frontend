@@ -1,3 +1,4 @@
+import { operacionHabilitada } from '@app/config/features.js';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Field } from '@shared/ui/Field.jsx';
@@ -384,7 +385,9 @@ export function PropertyFormPage() {
 
                 <Field label="Operación" required>
                   <select value={form.operacion} onChange={(e) => setForm({ ...form, operacion: e.target.value })}>
-                    {Object.entries(OPERATION_LABELS).map(([value, label]) => (
+                    {Object.entries(OPERATION_LABELS)
+                      .filter(([value]) => operacionHabilitada(value))
+                      .map(([value, label]) => (
                       <option key={value} value={value}>{label}</option>
                     ))}
                   </select>

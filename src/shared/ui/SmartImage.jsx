@@ -77,7 +77,10 @@ export function SmartImage({
       sizes={responsive.sizes}
       alt={alt}
       loading={loading}
-      fetchPriority={fetchPriority}
+      // React 18 no conoce 'fetchPriority' en camelCase y descarta el atributo
+      // entero: hay que escribirlo como lo espera el DOM para que de verdad
+      // llegue al navegador. En React 19 ambas formas funcionan.
+      fetchpriority={fetchPriority}
       decoding={decoding}
       onLoad={() => setCargada(true)}
       className={`img-suave ${cargada ? 'is-cargada' : ''} ${className}`.trim()}

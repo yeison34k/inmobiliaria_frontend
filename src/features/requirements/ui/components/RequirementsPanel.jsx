@@ -1,3 +1,4 @@
+import { ARRIENDOS } from '@app/config/features.js';
 import { useState } from 'react';
 import { Badge } from '@shared/ui/Badge.jsx';
 import { Field } from '@shared/ui/Field.jsx';
@@ -126,7 +127,7 @@ export function RequirementsPanel({ contactoId }) {
             <Field label="Operacion">
               <select value={form.operacion} onChange={(e) => setForm({ ...form, operacion: e.target.value })}>
                 <option value="venta">Compra</option>
-                <option value="arriendo">Arriendo</option>
+                {ARRIENDOS ? <option value="arriendo">Arriendo</option> : null}
               </select>
             </Field>
             <Field label="Ciudad">

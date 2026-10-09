@@ -1,3 +1,4 @@
+import { ARRIENDOS } from '@app/config/features.js';
 import { useState, useRef, useEffect, lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Reveal } from '@shared/ui/Reveal.jsx';
@@ -115,7 +116,7 @@ export function HomePage() {
               onChange={(e) => setBusqueda({ ...busqueda, operacion: e.target.value })}
             >
               <option value="venta">{t('home.hero.operationBuy')}</option>
-              <option value="arriendo">{t('home.hero.operationRent')}</option>
+              {ARRIENDOS ? <option value="arriendo">{t('home.hero.operationRent')}</option> : null}
             </select>
             <span className="portada__divisor" aria-hidden="true" />
             <input

@@ -1,3 +1,4 @@
+import { ARRIENDOS } from '@app/config/features.js';
 import { useEffect, useState, Suspense } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { ScrollProgress } from '@shared/ui/ScrollProgress.jsx';
@@ -31,7 +32,9 @@ export function PublicLayout() {
         <Link to="/" className="brand">{t('nav.brand')}</Link>
         <nav className="topbar__nav">
           <NavLink to="/propiedades?operacion=venta" onMouseEnter={prefetchCatalog} onFocus={prefetchCatalog}>{t('nav.buy')}</NavLink>
-          <NavLink to="/propiedades?operacion=arriendo" onMouseEnter={prefetchCatalog} onFocus={prefetchCatalog}>{t('nav.rent')}</NavLink>
+          {ARRIENDOS ? (
+            <NavLink to="/propiedades?operacion=arriendo" onMouseEnter={prefetchCatalog} onFocus={prefetchCatalog}>{t('nav.rent')}</NavLink>
+          ) : null}
           <NavLink to="/propiedades" end onMouseEnter={prefetchCatalog} onFocus={prefetchCatalog}>{t('nav.all')}</NavLink>
           <NavLink to="/contacto" onMouseEnter={prefetchContact} onFocus={prefetchContact}>{t('nav.contact')}</NavLink>
           <LanguageSwitcher />

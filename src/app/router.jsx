@@ -1,3 +1,4 @@
+import { ARRIENDOS } from '@app/config/features.js';
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import { RequireAuth, UserRole } from '@features/auth';
@@ -146,11 +147,12 @@ export const router = createBrowserRouter([
           { path: 'oportunidades', element: <MatchesPage /> },
           { path: 'selecciones', element: <SelectionsPage /> },
           { path: 'operaciones', element: <OperationsPage /> },
-          { path: 'arrendamientos', element: <LeasesAdminPage /> },
           { path: 'contactos', element: <ContactsPage /> },
           { path: 'consultas', element: <InquiriesPage /> },
           { path: 'documentos', element: <DocumentsAdminPage /> },
           { path: 'portales', element: <PortalesAdminPage /> },
+          // Arrendamientos: la ruta vuelve al encender ARRIENDOS en app/config/features.js
+          ...(ARRIENDOS ? [{ path: 'arrendamientos', element: <LeasesAdminPage /> }] : []),
           { path: 'configuracion', element: <SettingsPage /> },
           { path: 'perfil', element: <ProfilePage /> },
         ],

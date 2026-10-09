@@ -1,3 +1,4 @@
+import { ARRIENDOS } from '@app/config/features.js';
 import { useState } from 'react';
 import { TYPE_LABELS } from '../../domain/property.js';
 import { useCities } from '../../application/usePropertiesQueries.js';
@@ -20,7 +21,7 @@ export function PropertyFilters({ valores, onChange, total }) {
   const operaciones = [
     { valor: undefined, label: t('catalog.filters.operation.all') },
     { valor: 'venta', label: t('catalog.filters.operation.buy') },
-    { valor: 'arriendo', label: t('catalog.filters.operation.rent') },
+    ...(ARRIENDOS ? [{ valor: 'arriendo', label: t('catalog.filters.operation.rent') }] : []),
   ];
 
   const sortOptions = [

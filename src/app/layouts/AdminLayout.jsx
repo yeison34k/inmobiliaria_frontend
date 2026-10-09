@@ -1,3 +1,4 @@
+import { ARRIENDOS } from '@app/config/features.js';
 import { useEffect, useState, Suspense } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { ROLE_LABELS, can, useAuth } from '@features/auth';
@@ -16,12 +17,13 @@ const NAV = [
   { to: '/admin/oportunidades', label: 'Oportunidades' },
   { to: '/admin/selecciones', label: 'Selecciones' },
   { to: '/admin/operaciones', label: 'Operaciones' },
-  { to: '/admin/arrendamientos', label: 'Arrendamientos' },
   { to: '/admin/contactos', label: 'Contactos' },
   { to: '/admin/consultas', label: 'Consultas' },
   { to: '/admin/documentos', label: 'Documentos' },
   { to: '/admin/portales', label: 'Portales' },
   { to: '/admin/configuracion', label: 'Ajustes' },
+  // Arrendamientos vuelve al menu cuando se encienda ARRIENDOS en app/config/features.js
+  ...(ARRIENDOS ? [{ to: '/admin/arrendamientos', label: 'Arrendamientos' }] : []),
 ];
 
 export function AdminLayout() {
