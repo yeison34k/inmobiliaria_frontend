@@ -4,9 +4,8 @@ import { SmartImage } from '@shared/ui/SmartImage.jsx';
 import { useTranslation } from '@shared/i18n/index.js';
 
 /**
- * Modal / Cajón comparador de propiedades lado a lado.
- * Permite contrastar de 2 a 4 inmuebles en precio, $/m², especificaciones,
- * amenidades y contacto directo.
+ * Modal comparador de propiedades lado a lado.
+ * Diseñado bajo la estética minimalista y editorial de la plataforma.
  */
 export function PropertyCompareModal({
   propiedades = [],
@@ -17,7 +16,7 @@ export function PropertyCompareModal({
 }) {
   const { t, formatMoney, typeLabel, operationLabel, isEn } = useTranslation();
 
-  // Cerrar con Escape y bloquear scroll del body
+  // Control de tecla Escape y bloqueo de desplazamiento del fondo
   useEffect(() => {
     if (!isOpen) return;
 
@@ -37,7 +36,7 @@ export function PropertyCompareModal({
 
   if (!isOpen) return null;
 
-  // Calcular precio por metro cuadrado y destacar la opción más costo-eficiente
+  // Cálculo de precio por m² y detección de la mejor relación costo/área
   const itemsConMetricas = propiedades.map((p) => {
     const d = p.detalles ?? {};
     const area = d.areaM2 || d.areaConstruidaM2 || d.areaLoteM2 || p.area;
@@ -45,7 +44,6 @@ export function PropertyCompareModal({
     return { ...p, areaCalc: area, precioM2Calc: precioM2 };
   });
 
-  // Encontrar el precio/m2 más bajo entre las que tienen cálculo disponible
   const preciosM2Validos = itemsConMetricas
     .map((p) => p.precioM2Calc)
     .filter((val) => typeof val === 'number' && val > 0);
@@ -63,92 +61,110 @@ export function PropertyCompareModal({
     const link = `${window.location.origin}/propiedades/${propiedad.slug}`;
 
     const mensaje = isEn
-      ? `Hello! I am comparing properties on your site and would like advisory on:\n*${nombre}* (Ref: ${ref})\n💰 Price: ${precio}\n🔗 Link: ${link}`
-      : `¡Hola! Estoy comparando propiedades en su portal y me interesa recibir asesoría sobre:\n*${nombre}* (Ref: ${ref})\n💰 Precio: ${precio}\n🔗 Enlace: ${link}`;
+      ? `Hello! I am comparing properties on your site and would like advisory on:\n*${nombre}* (Ref: ${ref})\nPrice: ${precio}\nLink: ${link}`
+      : `¡Hola! Estoy comparando propiedades en su portal y me interesa recibir asesoría sobre:\n*${nombre}* (Ref: ${ref})\nPrecio: ${precio}\nEnlace: ${link}`;
 
     window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(mensaje)}`, '_blank', 'noopener,noreferrer');
   };
 
   return (
-    <div className="compare-modal-backdrop" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="compare-modal-title">
-      <div className="compare-modal-box" onClick={(e) => e.stopPropagation()}>
-        {/* Cabecera del modal */}
-        <header className="compare-modal-header">
-          <div>
-            <div className="compare-modal-badge">
-              <span>⚖️</span> {t('catalog.compareBar.title')} ({propiedades.length}/4)
-            </div>
-            <h2 id="compare-modal-title" className="compare-modal-title">
-              {t('catalog.compareModal.title')}
+    <div
+      className="comp-modal-overlay"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="comp-modal-heading"
+    >
+      <div className="comp-modal-card" onClick={(e) => e.stopPropagation()}>
+        {/* Encabezado del modal */}
+        <header className="comp-modal-header">
+          <div className="comp-modal-header__info">
+            <span className="comp-modal-header__kicker">
+              {isEn ? 'Side-by-side comparison' : 'Comparativa de inmuebles'} ({propiedades.length}/4)
+            </span>
+            <h2 id="comp-modal-heading" className="comp-modal-header__title">
+              {isEn ? 'Compare Properties' : 'Comparador de Propiedades'}
             </h2>
-            <p className="compare-modal-subtitle">
-              {t('catalog.compareModal.subtitle')}
+            <p className="comp-modal-header__subtitle">
+              {isEn
+                ? 'Evaluate pricing, area, and specifications side by side.'
+                : 'Evalúe precios, áreas y especificaciones técnicas lado a lado.'}
             </p>
           </div>
-          <div className="compare-modal-actions">
+
+          <div className="comp-modal-header__actions">
             {propiedades.length > 0 && (
               <button
                 type="button"
                 className="btn btn--ghost btn--sm"
                 onClick={onClear}
-                title={t('catalog.compareBar.clear')}
               >
-                {t('catalog.compareBar.clear')}
+                {isEn ? 'Clear all' : 'Limpiar selección'}
               </button>
             )}
             <button
               type="button"
-              className="compare-modal-close"
+              className="comp-modal-close"
               onClick={onClose}
-              aria-label={t('catalog.compareModal.close')}
-              title={t('catalog.compareModal.close')}
+              aria-label={isEn ? 'Close' : 'Cerrar'}
+              title={isEn ? 'Close' : 'Cerrar'}
             >
-              ✕
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
             </button>
           </div>
         </header>
 
         {propiedades.length === 0 ? (
-          <div className="compare-modal-empty">
-            <p>{t('catalog.compareModal.empty')}</p>
+          <div className="comp-modal-empty">
+            <p>{isEn ? 'No properties selected for comparison.' : 'No has seleccionado propiedades para comparar.'}</p>
             <button type="button" className="btn btn--primary" onClick={onClose}>
-              {isEn ? 'Browse properties' : 'Explorar propiedades'}
+              {isEn ? 'Browse catalog' : 'Explorar catálogo'}
             </button>
           </div>
         ) : (
-          <div className="compare-table-wrapper">
-            <table className="compare-table">
+          <div className="comp-modal-body">
+            <table className="comp-table">
               <thead>
                 <tr>
-                  <th className="compare-table__feature-col">
-                    <span>{isEn ? 'Property' : 'Inmueble'}</span>
+                  <th className="comp-table__col-label">
+                    <span>{isEn ? 'Feature' : 'Especificación'}</span>
                   </th>
                   {itemsConMetricas.map((p) => {
                     const foto = p.imagenPrincipal || p.imagenes?.[0]?.url || p.imagenes?.[0];
                     return (
-                      <th key={p.id} className="compare-table__prop-col">
-                        <div className="compare-card-head">
+                      <th key={p.id} className="comp-table__col-prop">
+                        <div className="comp-card-head">
                           <button
                             type="button"
-                            className="compare-card-remove"
+                            className="comp-card-head__remove"
                             onClick={() => onRemove(p.id)}
                             title={isEn ? 'Remove from comparison' : 'Quitar de la comparación'}
-                            aria-label={isEn ? 'Remove property' : 'Quitar inmueble'}
+                            aria-label={isEn ? 'Remove property' : 'Quitar propiedad'}
                           >
-                            ✕
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <line x1="18" y1="6" x2="6" y2="18" />
+                              <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
                           </button>
-                          <div className="compare-card-thumb">
+
+                          <div className="comp-card-head__thumb">
                             {foto ? (
                               <SmartImage src={foto} alt={p.titulo} />
                             ) : (
-                              <div className="compare-card-thumb-empty">Sin foto</div>
+                              <span className="comp-card-head__empty-img">Sin imagen</span>
                             )}
-                            <span className="compare-card-chip">{operationLabel(p.operacion)}</span>
+                            <span className="comp-card-head__badge">
+                              {operationLabel(p.operacion)}
+                            </span>
                           </div>
-                          <strong className="compare-card-name" title={p.nombrePublico || p.titulo}>
+
+                          <strong className="comp-card-head__title" title={p.nombrePublico || p.titulo}>
                             {p.nombrePublico || p.titulo}
                           </strong>
-                          <span className="compare-card-code">{p.codigo || 'REF'}</span>
+                          <span className="comp-card-head__ref">{p.codigo || 'REF'}</span>
                         </div>
                       </th>
                     );
@@ -156,18 +172,16 @@ export function PropertyCompareModal({
                 </tr>
               </thead>
               <tbody>
-                {/* PRECIO */}
+                {/* PRECIO TOTAL */}
                 <tr>
-                  <td className="compare-table__feature-col">
-                    <strong>{isEn ? 'Price' : 'Precio'}</strong>
+                  <td className="comp-table__col-label">
+                    {isEn ? 'Total Price' : 'Precio Total'}
                   </td>
                   {itemsConMetricas.map((p) => (
-                    <td key={p.id} className="compare-val-price">
-                      <span className="compare-price-highlight">
-                        {formatMoney(p.precio, p.moneda)}
-                      </span>
+                    <td key={p.id} className="comp-val-price">
+                      <strong>{formatMoney(p.precio, p.moneda)}</strong>
                       {p.operacion === 'arriendo' && (
-                        <small className="compare-price-period">{t('card.perMonth')}</small>
+                        <small className="comp-val-period">{t('card.perMonth')}</small>
                       )}
                     </td>
                   ))}
@@ -175,173 +189,160 @@ export function PropertyCompareModal({
 
                 {/* PRECIO POR METRO CUADRADO */}
                 <tr>
-                  <td className="compare-table__feature-col">
-                    <strong>{t('catalog.compareModal.priceM2')}</strong>
+                  <td className="comp-table__col-label">
+                    {isEn ? 'Price per m²' : 'Precio / m²'}
                   </td>
                   {itemsConMetricas.map((p) => {
                     const esElMejor = mejorPrecioM2 && p.precioM2Calc === mejorPrecioM2;
                     return (
                       <td key={p.id}>
                         {p.precioM2Calc ? (
-                          <div className="compare-m2-box">
+                          <div className="comp-m2-wrap">
                             <span>{formatMoney(p.precioM2Calc, p.moneda)} / m²</span>
                             {esElMejor && (
-                              <span className="compare-best-badge" title="Mejor costo por área">
-                                🌟 {t('catalog.compareModal.bestPriceM2')}
+                              <span className="comp-best-chip" title={isEn ? 'Best price per square meter' : 'Mejor relación precio por área'}>
+                                {isEn ? 'Best $/m²' : 'Mejor $/m²'}
                               </span>
                             )}
                           </div>
                         ) : (
-                          <span className="compare-faint">—</span>
+                          <span className="comp-muted">—</span>
                         )}
                       </td>
                     );
                   })}
                 </tr>
 
-                {/* UBICACIÓN */}
+                {/* TIPO DE INMUEBLE */}
                 <tr>
-                  <td className="compare-table__feature-col">
-                    <strong>{t('catalog.compareModal.location')}</strong>
+                  <td className="comp-table__col-label">
+                    {isEn ? 'Property Type' : 'Tipo de Inmueble'}
                   </td>
                   {itemsConMetricas.map((p) => (
                     <td key={p.id}>
-                      <span className="compare-icon-text">
-                        📍 {[p.ubicacion?.barrio, p.ubicacion?.ciudad].filter(Boolean).join(', ') || '—'}
-                      </span>
+                      <span className="comp-tag-type">{typeLabel(p.tipo)}</span>
                     </td>
                   ))}
                 </tr>
 
-                {/* TIPO DE INMUEBLE */}
+                {/* UBICACIÓN */}
                 <tr>
-                  <td className="compare-table__feature-col">
-                    <strong>{t('catalog.compareModal.type')}</strong>
+                  <td className="comp-table__col-label">
+                    {isEn ? 'Location' : 'Ubicación'}
                   </td>
                   {itemsConMetricas.map((p) => (
                     <td key={p.id}>
-                      <span className="compare-tag-type">{typeLabel(p.tipo)}</span>
+                      <span className="comp-loc-text">
+                        {[p.ubicacion?.barrio, p.ubicacion?.ciudad].filter(Boolean).join(', ') || '—'}
+                      </span>
                     </td>
                   ))}
                 </tr>
 
                 {/* ÁREA */}
                 <tr>
-                  <td className="compare-table__feature-col">
-                    <strong>{t('catalog.compareModal.area')}</strong>
+                  <td className="comp-table__col-label">
+                    {isEn ? 'Built Area' : 'Área Construida'}
                   </td>
                   {itemsConMetricas.map((p) => (
                     <td key={p.id}>
-                      {p.areaCalc ? <strong>{p.areaCalc} m²</strong> : <span className="compare-faint">—</span>}
+                      {p.areaCalc ? <strong>{p.areaCalc} m²</strong> : <span className="comp-muted">—</span>}
                     </td>
                   ))}
                 </tr>
 
                 {/* HABITACIONES */}
                 <tr>
-                  <td className="compare-table__feature-col">
-                    <strong>{t('catalog.compareModal.rooms')}</strong>
+                  <td className="comp-table__col-label">
+                    {isEn ? 'Bedrooms' : 'Habitaciones'}
                   </td>
                   {itemsConMetricas.map((p) => (
                     <td key={p.id}>
-                      {p.detalles?.habitaciones ? (
-                        <span>🛏️ {p.detalles.habitaciones}</span>
-                      ) : (
-                        <span className="compare-faint">—</span>
-                      )}
+                      {p.detalles?.habitaciones ? `${p.detalles.habitaciones} hab` : <span className="comp-muted">—</span>}
                     </td>
                   ))}
                 </tr>
 
                 {/* BAÑOS */}
                 <tr>
-                  <td className="compare-table__feature-col">
-                    <strong>{t('catalog.compareModal.baths')}</strong>
+                  <td className="comp-table__col-label">
+                    {isEn ? 'Bathrooms' : 'Baños'}
                   </td>
                   {itemsConMetricas.map((p) => (
                     <td key={p.id}>
-                      {p.detalles?.banos ? (
-                        <span>🛁 {p.detalles.banos}</span>
-                      ) : (
-                        <span className="compare-faint">—</span>
-                      )}
+                      {p.detalles?.banos ? `${p.detalles.banos} baños` : <span className="comp-muted">—</span>}
                     </td>
                   ))}
                 </tr>
 
                 {/* PARQUEADEROS */}
                 <tr>
-                  <td className="compare-table__feature-col">
-                    <strong>{t('catalog.compareModal.parking')}</strong>
+                  <td className="comp-table__col-label">
+                    {isEn ? 'Parking Spaces' : 'Parqueaderos'}
                   </td>
                   {itemsConMetricas.map((p) => (
                     <td key={p.id}>
-                      {p.detalles?.parqueaderos ? (
-                        <span>🚗 {p.detalles.parqueaderos}</span>
-                      ) : (
-                        <span className="compare-faint">—</span>
-                      )}
+                      {p.detalles?.parqueaderos ? `${p.detalles.parqueaderos} parq` : <span className="comp-muted">—</span>}
                     </td>
                   ))}
                 </tr>
 
-                {/* TOUR 3D */}
+                {/* RECORRIDO VIRTUAL 3D */}
                 <tr>
-                  <td className="compare-table__feature-col">
-                    <strong>{t('catalog.compareModal.tour3d')}</strong>
+                  <td className="comp-table__col-label">
+                    {isEn ? '3D Tour' : 'Recorrido 3D'}
                   </td>
                   {itemsConMetricas.map((p) => (
                     <td key={p.id}>
                       {p.tourUrl || p.historia?.tourUrl ? (
-                        <span className="compare-badge-3d">🥽 {isEn ? 'Available' : 'Disponible'}</span>
+                        <span className="comp-chip-tour">{isEn ? 'Available' : 'Disponible'}</span>
                       ) : (
-                        <span className="compare-faint">{isEn ? 'Not included' : 'No'}</span>
+                        <span className="comp-muted">{isEn ? 'Not included' : 'No incluido'}</span>
                       )}
                     </td>
                   ))}
                 </tr>
 
-                {/* ADMINISTRACIÓN */}
+                {/* ADMINISTRACIÓN MENSUAL */}
                 <tr>
-                  <td className="compare-table__feature-col">
-                    <strong>{t('catalog.compareModal.adminFee')}</strong>
+                  <td className="comp-table__col-label">
+                    {isEn ? 'Monthly HOA' : 'Administración'}
                   </td>
                   {itemsConMetricas.map((p) => (
                     <td key={p.id}>
                       {p.detalles?.administracionMensual ? (
                         <span>{formatMoney(p.detalles.administracionMensual, p.moneda)} / mes</span>
                       ) : (
-                        <span className="compare-faint">—</span>
+                        <span className="comp-muted">—</span>
                       )}
                     </td>
                   ))}
                 </tr>
 
-                {/* BOTONES DE ACCIÓN */}
-                <tr className="compare-table__actions-row">
-                  <td className="compare-table__feature-col">
-                    <strong>{isEn ? 'Actions' : 'Acciones'}</strong>
+                {/* ACCIONES DIRECTAS */}
+                <tr className="comp-table__row-actions">
+                  <td className="comp-table__col-label">
+                    {isEn ? 'Actions' : 'Acciones'}
                   </td>
                   {itemsConMetricas.map((p) => (
                     <td key={p.id}>
-                      <div className="compare-cell-actions">
+                      <div className="comp-actions-cell">
                         <Link
                           to={`/propiedades/${p.slug}`}
-                          className="btn btn--primary btn--sm compare-btn-view"
+                          className="btn btn--primary btn--sm comp-btn-view"
                           onClick={onClose}
                         >
-                          {t('catalog.compareModal.viewProperty')} →
+                          {isEn ? 'View property' : 'Ver propiedad'}
                         </Link>
                         <button
                           type="button"
-                          className="compare-btn-wa"
+                          className="btn btn--ghost btn--sm comp-btn-wa"
                           onClick={() => handleWhatsApp(p)}
-                          title={t('catalog.compareModal.contact')}
                         >
-                          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
                             <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.586-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.697.073-2.18-.541-1.614-.666-2.613-2.372-2.694-2.48-.08-.108-.66-88-.66-1.677 0-.796.417-1.189.566-1.351.149-.162.327-.202.435-.202.109 0 .218.001.313.006.101.005.236-.039.369.28.136.326.463 1.13.504 1.211.04.082.067.177.013.284-.053.107-.08.175-.16.269-.079.094-.167.21-.238.282-.08.082-.162.171-.07.328.093.158.411.678.882 1.097.606.539 1.116.707 1.274.786.158.079.251.069.344-.04.093-.108.399-.464.506-.624.106-.16.213-.133.359-.08.146.053.929.438 1.089.518.16.079.266.12.306.186.04.066.04.385-.104.79zM12 2C6.477 2 2 6.477 2 12c0 1.891.526 3.659 1.438 5.169L2 22l4.985-1.408C8.423 21.523 10.155 22 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.2c-1.637 0-3.159-.472-4.444-1.285l-.319-.202-2.956.834.843-2.887-.211-.336C4.053 14.996 3.6 13.535 3.6 12c0-4.632 3.768-8.4 8.4-8.4 4.633 0 8.4 3.768 8.4 8.4 0 4.632-3.767 8.4-8.4 8.4z" />
                           </svg>
-                          <span>{t('card.contactWhatsApp')}</span>
+                          <span>WhatsApp</span>
                         </button>
                       </div>
                     </td>
