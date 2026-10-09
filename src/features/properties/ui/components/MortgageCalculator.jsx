@@ -29,9 +29,13 @@ export function MortgageCalculator({ precio, moneda = 'COP', onConsultarCredito 
   // Fórmula de amortización francesa de cuota fija:
   // C = P * [ i * (1 + i)^n ] / [ (1 + i)^n - 1 ]
   let cuotaMensual = 0;
-  if (montoPrestamo > 0 && i > 0 && n > 0) {
-    const factor = Math.pow(1 + i, n);
-    cuotaMensual = Math.round((montoPrestamo * (i * factor)) / (factor - 1));
+  if (montoPrestamo > 0 && n > 0) {
+    if (i > 0) {
+      const factor = Math.pow(1 + i, n);
+      cuotaMensual = Math.round((montoPrestamo * (i * factor)) / (factor - 1));
+    } else {
+      cuotaMensual = Math.round(montoPrestamo / n);
+    }
   }
 
   const totalPagar = cuotaMensual * n;

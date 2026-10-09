@@ -60,7 +60,9 @@ export function calculateSettlement({
 
   const totalDeducciones = deducciones.reduce((acc, d) => acc + (Number(d.monto) || 0), 0);
   const totalDescuentos = honorarioTotalAgencia + totalDeducciones;
-  const netoGirar = Math.max(0, canonNum - totalDescuentos);
+  const saldoNeto = canonNum - totalDescuentos;
+  const netoGirar = Math.max(0, saldoNeto);
+  const saldoEnContra = saldoNeto < 0 ? Math.abs(saldoNeto) : 0;
 
   return {
     canon: canonNum,
@@ -72,6 +74,8 @@ export function calculateSettlement({
     honorarioTotalAgencia,
     totalDeducciones,
     totalDescuentos,
+    saldoNeto,
+    saldoEnContra,
     netoGirar,
   };
 }
