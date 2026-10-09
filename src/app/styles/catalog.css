@@ -227,12 +227,13 @@
   padding: .24rem .6rem; border-radius: 4px;
 }
 .tarjeta__sello {
-  position: absolute; right: .8rem; top: .8rem; z-index: 2;
+  position: absolute; left: .8rem; top: 2.35rem; z-index: 2;
   background: #fff; color: var(--text);
   font-family: var(--font-display);
   font-size: .625rem; font-weight: 600;
   letter-spacing: .08em; text-transform: uppercase;
   padding: .24rem .6rem; border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 @keyframes tourBadgePulse {
   0%, 100% {
@@ -1398,30 +1399,34 @@
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
-  z-index: 4;
+  z-index: 6;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.28rem 0.65rem;
-  background: rgba(255, 255, 255, 0.92);
+  padding: 0.3rem 0.7rem;
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: var(--text, #0f1115);
-  border: 1px solid rgba(15, 17, 21, 0.12);
+  border: 1px solid rgba(15, 17, 21, 0.14);
   border-radius: 999px;
   font-family: var(--font-display);
-  font-size: 0.72rem;
+  font-size: 0.73rem;
   font-weight: 500;
   letter-spacing: -0.01em;
   cursor: pointer;
   transition: all 0.18s ease;
-  box-shadow: 0 2px 8px rgba(15, 17, 21, 0.08);
+  box-shadow: 0 2px 8px rgba(15, 17, 21, 0.1);
+  user-select: none;
+}
+.tarjeta__btn-comparar * {
+  pointer-events: none;
 }
 .tarjeta__btn-comparar:hover {
   background: #ffffff;
   border-color: var(--border-strong);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(15, 17, 21, 0.12);
+  box-shadow: 0 4px 12px rgba(15, 17, 21, 0.16);
 }
 .tarjeta__btn-comparar.is-activo {
   background: var(--primary, #1a1d23);
@@ -1567,7 +1572,7 @@
   bottom: 1.5rem;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 95;
+  z-index: 9999 !important;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -1763,7 +1768,7 @@
 .comp-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 120;
+  z-index: 99999 !important;
   background: rgba(15, 17, 21, 0.48);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);

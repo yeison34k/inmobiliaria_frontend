@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { SmartImage } from '@shared/ui/SmartImage.jsx';
 import { useTranslation } from '@shared/i18n/index.js';
@@ -6,6 +7,8 @@ import { useTranslation } from '@shared/i18n/index.js';
 /**
  * Modal comparador de propiedades lado a lado.
  * Diseñado bajo la estética minimalista y editorial de la plataforma.
+ * Renderizado directamente en document.body mediante portal para flotar sobre el viewport
+ * sin sufrir interferencias de contexto de apilamiento o transformaciones de páginas.
  */
 export function PropertyCompareModal({
   propiedades = [],
@@ -21,7 +24,7 @@ export function PropertyCompareModal({
     if (!isOpen) return;
 
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') onClose?.();
     };
 
     const originalOverflow = document.body.style.overflow;
@@ -67,7 +70,7 @@ export function PropertyCompareModal({
     window.open(`https://wa.me/${targetPhone}?text=${encodeURIComponent(mensaje)}`, '_blank', 'noopener,noreferrer');
   };
 
-  return (
+  const modalNode = (
     <div
       className="comp-modal-overlay"
       onClick={onClose}
@@ -134,13 +137,14 @@ export function PropertyCompareModal({
                   </th>
                   {itemsConMetricas.map((p) => {
                     const foto = p.imagenPrincipal || p.imagenes?.[0]?.url || p.imagenes?.[0];
+                    const id = p.id ?? p.slug;
                     return (
-                      <th key={p.id} className="comp-table__col-prop">
+                      <th key={id} className="comp-table__col-prop">
                         <div className="comp-card-head">
                           <button
                             type="button"
                             className="comp-card-head__remove"
-                            onClick={() => onRemove(p.id)}
+                            onClick={() => onRemove?.(id)}
                             title={isEn ? 'Remove from comparison' : 'Quitar de la comparación'}
                             aria-label={isEn ? 'Remove property' : 'Quitar propiedad'}
                           >
@@ -178,7 +182,7 @@ export function PropertyCompareModal({
                     {isEn ? 'Total Price' : 'Precio Total'}
                   </td>
                   {itemsConMetricas.map((p) => (
-                    <td key={p.id} className="comp-val-price">
+                    <td key={p.id ?? p.slug} className="comp-val-price">
                       <strong>{formatMoney(p.precio, p.moneda)}</strong>
                       {p.operacion === 'arriendo' && (
                         <small className="comp-val-period">{t('card.perMonth')}</small>
@@ -195,7 +199,7 @@ export function PropertyCompareModal({
                   {itemsConMetricas.map((p) => {
                     const esElMejor = mejorPrecioM2 && p.precioM2Calc === mejorPrecioM2;
                     return (
-                      <td key={p.id}>
+                      <td key={p.id ?? p.slug}>
                         {p.precioM2Calc ? (
                           <div className="comp-m2-wrap">
                             <span>{formatMoney(p.precioM2Calc, p.moneda)} / m²</span>
@@ -219,7 +223,7 @@ export function PropertyCompareModal({
                     {isEn ? 'Property Type' : 'Tipo de Inmueble'}
                   </td>
                   {itemsConMetricas.map((p) => (
-                    <td key={p.id}>
+                    <td key={p.id ?? p.slug}>
                       <span className="comp-tag-type">{typeLabel(p.tipo)}</span>
                     </td>
                   ))}
@@ -231,7 +235,7 @@ export function PropertyCompareModal({
                     {isEn ? 'Location' : 'Ubicación'}
                   </td>
                   {itemsConMetricas.map((p) => (
-                    <td key={p.id}>
+                    <td key={p.id ?? p.slug}>
                       <span className="comp-loc-text">
                         {[p.ubicacion?.barrio, p.ubicacion?.ciudad].filter(Boolean).join(', ') || '—'}
                       </span>
@@ -245,7 +249,7 @@ export function PropertyCompareModal({
                     {isEn ? 'Built Area' : 'Área Construida'}
                   </td>
                   {itemsConMetricas.map((p) => (
-                    <td key={p.id}>
+                    <td key={p.id ?? p.slug}>
                       {p.areaCalc ? <strong>{p.areaCalc} m²</strong> : <span className="comp-muted">—</span>}
                     </td>
                   ))}
@@ -257,7 +261,7 @@ export function PropertyCompareModal({
                     {isEn ? 'Bedrooms' : 'Habitaciones'}
                   </td>
                   {itemsConMetricas.map((p) => (
-                    <td key={p.id}>
+                    <td key={p.id ?? p.slug}>
                       {p.detalles?.habitaciones ? `${p.detalles.habitaciones} hab` : <span className="comp-muted">—</span>}
                     </td>
                   ))}
@@ -269,7 +273,7 @@ export function PropertyCompareModal({
                     {isEn ? 'Bathrooms' : 'Baños'}
                   </td>
                   {itemsConMetricas.map((p) => (
-                    <td key={p.id}>
+                    <td key={p.id ?? p.slug}>
                       {p.detalles?.banos ? `${p.detalles.banos} baños` : <span className="comp-muted">—</span>}
                     </td>
                   ))}
@@ -281,7 +285,7 @@ export function PropertyCompareModal({
                     {isEn ? 'Parking Spaces' : 'Parqueaderos'}
                   </td>
                   {itemsConMetricas.map((p) => (
-                    <td key={p.id}>
+                    <td key={p.id ?? p.slug}>
                       {p.detalles?.parqueaderos ? `${p.detalles.parqueaderos} parq` : <span className="comp-muted">—</span>}
                     </td>
                   ))}
@@ -293,7 +297,7 @@ export function PropertyCompareModal({
                     {isEn ? '3D Tour' : 'Recorrido 3D'}
                   </td>
                   {itemsConMetricas.map((p) => (
-                    <td key={p.id}>
+                    <td key={p.id ?? p.slug}>
                       {p.tourUrl || p.historia?.tourUrl ? (
                         <span className="comp-chip-tour">{isEn ? 'Available' : 'Disponible'}</span>
                       ) : (
@@ -309,7 +313,7 @@ export function PropertyCompareModal({
                     {isEn ? 'Monthly HOA' : 'Administración'}
                   </td>
                   {itemsConMetricas.map((p) => (
-                    <td key={p.id}>
+                    <td key={p.id ?? p.slug}>
                       {p.detalles?.administracionMensual ? (
                         <span>{formatMoney(p.detalles.administracionMensual, p.moneda)} / mes</span>
                       ) : (
@@ -325,7 +329,7 @@ export function PropertyCompareModal({
                     {isEn ? 'Actions' : 'Acciones'}
                   </td>
                   {itemsConMetricas.map((p) => (
-                    <td key={p.id}>
+                    <td key={p.id ?? p.slug}>
                       <div className="comp-actions-cell">
                         <Link
                           to={`/propiedades/${p.slug}`}
@@ -355,4 +359,8 @@ export function PropertyCompareModal({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalNode, document.body)
+    : modalNode;
 }

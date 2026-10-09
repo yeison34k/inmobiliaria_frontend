@@ -50,7 +50,8 @@ export function CatalogPage() {
   const [comparadas, setComparadas] = useState(() => {
     try {
       const guardadas = sessionStorage.getItem('propiedades_comparadas');
-      return guardadas ? JSON.parse(guardadas) : [];
+      const parsed = guardadas ? JSON.parse(guardadas) : [];
+      return Array.isArray(parsed) ? parsed.filter((p) => p && (p.id || p.slug)) : [];
     } catch {
       return [];
     }
@@ -64,10 +65,11 @@ export function CatalogPage() {
   }, [comparadas]);
 
   const toggleComparar = (propiedad) => {
+    if (!propiedad) return;
     setComparadas((prev) => {
-      const existe = prev.some((p) => p.id === propiedad.id);
+      const existe = prev.some((p) => (p.id && p.id === propiedad.id) || (p.slug && p.slug === propiedad.slug));
       if (existe) {
-        return prev.filter((p) => p.id !== propiedad.id);
+        return prev.filter((p) => (p.id ? p.id !== propiedad.id : p.slug !== propiedad.slug));
       }
       if (prev.length >= 4) {
         alert(isEn ? 'You can compare up to 4 properties' : 'Puedes seleccionar hasta 4 propiedades para comparar');
@@ -77,8 +79,8 @@ export function CatalogPage() {
     });
   };
 
-  const quitarDeComparar = (id) => {
-    setComparadas((prev) => prev.filter((p) => p.id !== id));
+  const quitarDeComparar = (identificador) => {
+    setComparadas((prev) => prev.filter((p) => p.id !== identificador && p.slug !== identificador));
   };
 
   const limpiarComparacion = () => {
@@ -277,7 +279,7 @@ export function CatalogPage() {
                     to={`/propiedades/${propiedad.slug}`}
                     ancha={ancha}
                     prioritaria={destacarPrimera && indice < 2}
-                    enComparacion={comparadas.some((p) => p.id === propiedad.id)}
+                    enComparacion={comparadas.some((p) => (p.id && p.id === propiedad.id) || (p.slug && p.slug === propiedad.slug))}
                     onToggleComparar={toggleComparar}
                   />
                 </Reveal>
@@ -303,7 +305,7 @@ export function CatalogPage() {
                   propiedad={propiedad}
                   to={`/propiedades/${propiedad.slug}`}
                   prioritaria={indice < 2}
-                  enComparacion={comparadas.some((p) => p.id === propiedad.id)}
+                  enComparacion={comparadas.some((p) => (p.id && p.id === propiedad.id) || (p.slug && p.slug === propiedad.slug))}
                   onToggleComparar={toggleComparar}
                 />
               </div>

@@ -1,9 +1,11 @@
+import { createPortal } from 'react-dom';
 import { SmartImage } from '@shared/ui/SmartImage.jsx';
 import { useTranslation } from '@shared/i18n/index.js';
 
 /**
  * Barra flotante inferior para gestión de propiedades en comparación.
- * Diseñada en sintonía con el sistema visual sobrio y minimalista de la plataforma.
+ * Renderizada directamente en document.body mediante portal para flotar sobre el viewport
+ * sin sufrir interferencias de contexto de apilamiento o transformaciones de páginas.
  */
 export function PropertyCompareBar({
   propiedades = [],
@@ -11,11 +13,11 @@ export function PropertyCompareBar({
   onRemove,
   onClear,
 }) {
-  const { t, formatMoney, isEn } = useTranslation();
+  const { t, isEn } = useTranslation();
 
   if (!propiedades.length) return null;
 
-  return (
+  const content = (
     <aside className="compare-dock" aria-label={t('catalog.compareBar.title')}>
       <div className="compare-dock__info">
         <span className="compare-dock__icon" aria-hidden="true">
@@ -39,8 +41,9 @@ export function PropertyCompareBar({
       <div className="compare-dock__thumbs">
         {propiedades.map((p) => {
           const foto = p.imagenPrincipal || p.imagenes?.[0]?.url || p.imagenes?.[0];
+          const id = p.id ?? p.slug;
           return (
-            <div key={p.id} className="compare-dock__thumb" title={p.nombrePublico || p.titulo}>
+            <div key={id} className="compare-dock__thumb" title={p.nombrePublico || p.titulo}>
               {foto ? (
                 <SmartImage src={foto} alt={p.titulo} />
               ) : (
@@ -50,8 +53,9 @@ export function PropertyCompareBar({
                 type="button"
                 className="compare-dock__thumb-remove"
                 onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
-                  onRemove(p.id);
+                  onRemove(id);
                 }}
                 aria-label={`Quitar ${p.titulo}`}
                 title={isEn ? 'Remove' : 'Quitar'}
@@ -70,8 +74,14 @@ export function PropertyCompareBar({
       <div className="compare-dock__actions">
         <button
           type="button"
+          id="btn-comparar-ahora"
           className="btn btn--primary compare-dock__btn-compare"
-          onClick={onOpenModal}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onOpenModal?.();
+          }}
+          title={isEn ? 'Open side-by-side comparison' : 'Abrir comparador lado a lado'}
         >
           <span>{isEn ? 'Compare now' : 'Comparar ahora'}</span>
           <span className="compare-dock__badge-num">{propiedades.length}</span>
@@ -80,7 +90,11 @@ export function PropertyCompareBar({
         <button
           type="button"
           className="btn btn--ghost compare-dock__btn-clear"
-          onClick={onClear}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onClear?.();
+          }}
           title={isEn ? 'Clear all' : 'Limpiar selección'}
         >
           {isEn ? 'Clear' : 'Limpiar'}
@@ -88,4 +102,8 @@ export function PropertyCompareBar({
       </div>
     </aside>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(content, document.body)
+    : content;
 }
